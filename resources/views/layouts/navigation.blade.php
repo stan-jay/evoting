@@ -4,8 +4,9 @@
 
             {{-- Left: Logo + Desktop Nav --}}
             <div class="flex items-center space-x-8">
-                <a href="{{ Route::has('home') ? route('home') : url('/') }}" class="text-lg font-bold text-blue-600 hover:text-blue-700 transition">
-                    {{ config('app.name', 'E-Voting') }}
+                <a href="{{ Route::has('home') ? route('home') : url('/') }}" class="flex items-center gap-2 text-lg font-bold text-blue-600 hover:text-blue-700 transition">
+                    <x-application-logo size="36" class="border border-slate-300" />
+                    <span>{{ config('app.name', 'E-Voting') }}</span>
                 </a>
 
                 <div class="hidden lg:flex lg:space-x-1">
