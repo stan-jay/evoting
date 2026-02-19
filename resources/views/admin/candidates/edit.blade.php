@@ -1,31 +1,30 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h2>Edit Candidate</h2>
+<div class="max-w-3xl mx-auto space-y-6">
+    <div class="bg-white p-6 rounded-xl border shadow-sm">
+        <h1 class="text-xl font-bold">Candidate Details</h1>
+        <p class="text-sm text-gray-600 mt-1">This page is read-only for admin review.</p>
+    </div>
 
-    <form method="POST"
-          action="{{ route('officer.candidates.update', $candidate) }}"
-          enctype="multipart/form-data">
-        @csrf
-        @method('PUT')
-
-        <input class="form-control mb-2"
-               name="name"
-               value="{{ $candidate->name }}"
-               required>
-
-        <textarea class="form-control mb-2"
-                  name="manifesto">{{ $candidate->manifesto }}</textarea>
-
-        <select name="status" class="form-control mb-2">
-            <option value="pending"  @selected($candidate->status=='pending')>Pending</option>
-            <option value="approved" @selected($candidate->status=='approved')>Approved</option>
-        </select>
-
-        <input type="file" name="photo" class="form-control mb-3">
-
-        <button class="btn btn-primary">Update Candidate</button>
-    </form>
+    <div class="bg-white p-6 rounded-xl border shadow-sm space-y-4">
+        <div>
+            <p class="text-sm text-gray-500">Name</p>
+            <p class="font-medium">{{ $candidate->name }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Manifesto</p>
+            <p class="text-gray-700">{{ $candidate->manifesto ?: 'No manifesto provided.' }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Status</p>
+            <p class="font-medium capitalize">{{ $candidate->status }}</p>
+        </div>
+        <div>
+            <a href="{{ route('admin.candidates.index') }}" class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+                Back to Candidates
+            </a>
+        </div>
+    </div>
 </div>
 @endsection

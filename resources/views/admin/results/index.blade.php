@@ -23,32 +23,31 @@
                         <td class="py-2">{{ $election->title }}</td>
                         <td>{{ ucfirst($election->status) }}</td>
                         <td class="text-right">
-                            @if($election->status === 'closed')
-                            <a href="{{ route('admin.results.show', $election) }}" class="text-blue-600">
-                                View Results
-                            </a>
-                            @else
-                            <span class="text-gray-400 text-sm italic">
-                                Results not available
-                            </span>
-                            @endif
+                            <div class="inline-flex items-center gap-3">
+                                @if(in_array($election->status, ['active', 'closed', 'declared']))
+                                    <a href="{{ route('admin.results.show', $election) }}" class="text-blue-600">
+                                        View Analytics
+                                    </a>
+                                @endif
+
+                                @if($election->status === 'closed')
+                                    <form method="POST" action="{{ route('admin.results.publish', $election) }}" class="inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="text-emerald-700">Publish</button>
+                                    </form>
+                                @elseif($election->status === 'declared')
+                                    <form method="POST" action="{{ route('admin.results.unpublish', $election) }}" class="inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="text-amber-700">Unpublish</button>
+                                    </form>
+                                @endif
+                            </div>
 
                         </td>
                     </tr>
                 @empty
-                <tr>
-                    @if($resultsVisible)
-    <a href="{{ route('admin.results.pdf') }}"
-       class="btn btn-danger">
-        Download Official PDF
-    </a>
-@else
-    <button class="btn btn-secondary" disabled>
-        PDF Disabled (Results Not Published)
-    </button>
-@endif
-
-                </tr>
                     <tr>
                         <td colspan="3" class="py-6 text-center text-gray-500">
                             No elections found.

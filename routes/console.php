@@ -10,3 +10,11 @@ Artisan::command('inspire', function () {
 
 Schedule::command('elections:update-status')
     ->everyMinute();
+
+Schedule::command('app:backup-db --retention=14')
+    ->dailyAt('02:00')
+    ->withoutOverlapping();
+
+Schedule::command('app:env-sanity-check')
+    ->dailyAt('01:30')
+    ->withoutOverlapping();

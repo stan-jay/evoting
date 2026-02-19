@@ -11,23 +11,27 @@
 </head>
 <body>
 
-<h2>{{ $election->title }} — Results</h2>
+<h2>{{ $election->title }} - Results</h2>
 
 <table>
     <thead>
         <tr>
-            <th>Candidate</th>
             <th>Position</th>
+            <th>Rank</th>
+            <th>Candidate</th>
             <th>Total Votes</th>
         </tr>
     </thead>
     <tbody>
-        @foreach($results as $row)
-            <tr>
-                <td>{{ $row->candidate->name }}</td>
-                <td>{{ $row->candidate->position->name }}</td>
-                <td>{{ $row->total_votes }}</td>
-            </tr>
+        @foreach($resultsByPosition as $block)
+            @foreach(($block['results'] ?? []) as $rank => $row)
+                <tr>
+                    <td>{{ $block['position']->name ?? 'Unknown' }}</td>
+                    <td>{{ $rank + 1 }}</td>
+                    <td>{{ $row['candidate']['name'] ?? 'Unknown' }}</td>
+                    <td>{{ $row['votes'] ?? 0 }}</td>
+                </tr>
+            @endforeach
         @endforeach
     </tbody>
 </table>

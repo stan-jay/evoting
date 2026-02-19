@@ -1,22 +1,46 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PublicResultController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\CandidateController as AdminCandidateController;
 use App\Http\Controllers\Admin\ElectionController;
 use App\Http\Controllers\Officer\PositionController;
-use App\Http\Controllers\Officer\CandidateController;
+use App\Http\Controllers\Officer\CandidateController as OfficerCandidateController;
 use App\Http\Controllers\Voter\VoteController;
-use App\Http\Controllers\Admin\ResultController;
+use App\Http\Controllers\Voter\DashboardController as VoterDashboardController;
+use App\Http\Controllers\Admin\AdminResultController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\CandidateApprovalController;
 use App\Http\Controllers\Admin\AuditLogController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\InviteController as AdminInviteController;
+use App\Http\Controllers\SuperAdmin\OrganizationController as SuperAdminOrganizationController;
+use App\Http\Controllers\SuperAdmin\UserInterventionController as SuperAdminUserInterventionController;
+use App\Http\Controllers\SuperAdmin\DocumentationController as SuperAdminDocumentationController;
 
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'active'])->get('/dashboard', DashboardController::class)->name('dashboard');
+
+Route::middleware(['auth', 'active'])->group(function () {
+    // SUPER ADMIN
+    Route::middleware(['auth', 'role:super_admin'])
+        ->prefix('super-admin')
+        ->name('super_admin.')
+        ->group(function () {
+            Route::get('/dashboard', [SuperAdminOrganizationController::class, 'index'])->name('dashboard');
+            Route::get('/organizations', [SuperAdminOrganizationController::class, 'index'])->name('organizations.index');
+            Route::post('/organizations', [SuperAdminOrganizationController::class, 'store'])->name('organizations.store');
+            Route::delete('/organizations/{organization}', [SuperAdminOrganizationController::class, 'destroy'])->name('organizations.destroy');
+            Route::get('/users', [SuperAdminUserInterventionController::class, 'index'])->name('users.index');
+            Route::put('/users/{user}', [SuperAdminUserInterventionController::class, 'update'])->name('users.update');
+            Route::get('/docs', [SuperAdminDocumentationController::class, 'show'])->name('docs.show');
+        });
 
     // ADMIN
 Route::middleware(['auth', 'role:admin'])
@@ -42,7 +66,7 @@ Route::middleware(['auth', 'role:admin'])
             ->name('elections.close');
 
         // Candidates (view all)
-        Route::get('/candidates', [CandidateController::class, 'index'])
+        Route::get('/candidates', [AdminCandidateController::class, 'index'])
             ->name('candidates.index');
 
         // Candidate Approval
@@ -56,22 +80,42 @@ Route::middleware(['auth', 'role:admin'])
             ->name('candidates.reject');
 
         // Results
-        Route::get('/results', [ResultController::class, 'index'])
+        Route::get('/results', [AdminResultController::class, 'index'])
             ->name('results.index');
 
-        Route::get('/results/{election}', [ResultController::class, 'show'])
+        Route::get('/results/{election}', [AdminResultController::class, 'show'])
             ->name('results.show');
 
-        Route::get('/results/{election}/pdf', [ResultController::class, 'pdf'])
+        Route::get('/results/{election}/pdf', [AdminResultController::class, 'pdf'])
             ->name('results.pdf');
 
-        Route::get('/admin/results/pdf', [ResultController::class, 'exportPdf'])
-            ->name('admin.results.pdf');
+        Route::get('/results/{election}/excel', [AdminResultController::class, 'excel'])
+            ->name('results.excel');
 
-        
+        Route::get('/results/{election}/live', [AdminResultController::class, 'live'])
+            ->middleware('throttle:results-live')
+            ->name('results.live');
+
+        Route::patch('/results/{election}/publish', [AdminResultController::class, 'publish'])
+            ->name('results.publish');
+
+        Route::patch('/results/{election}/unpublish', [AdminResultController::class, 'unpublish'])
+            ->name('results.unpublish');
+
         // Audit Logs
         Route::get('/audit-logs', [AuditLogController::class, 'index'])
         ->name('audit.logs');
+
+
+        // Admin user management
+        Route::get('users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::put('users/{user}', [AdminUserController::class, 'update'])->name('users.update');
+        Route::delete('users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+
+        // Organization invites
+        Route::get('invites', [AdminInviteController::class, 'index'])->name('invites.index');
+        Route::post('invites', [AdminInviteController::class, 'store'])->middleware('throttle:invite-create')->name('invites.store');
+        Route::post('invites/{invite}/resend', [AdminInviteController::class, 'resend'])->middleware('throttle:invite-create')->name('invites.resend');
     });
 
 
@@ -84,9 +128,10 @@ Route::middleware(['auth', 'role:admin'])
             Route::get('/dashboard', fn () => view('officer.dashboard'))->name('dashboard');
 
             Route::resource('positions', PositionController::class);
-            Route::resource('candidates', CandidateController::class);
+            Route::resource('candidates', OfficerCandidateController::class);
 
-            Route::get('/results/{election}', [ResultController::class, 'show'])->name('results.show');
+            Route::get('/results/{election}', [PublicResultController::class, 'showOfficer'])->name('results.show');
+            Route::get('/results/{election}/live', [PublicResultController::class, 'liveOfficer'])->middleware('throttle:results-live')->name('results.live');
             
         });
 
@@ -97,14 +142,14 @@ Route::middleware(['auth', 'role:admin'])
         ->prefix('voter')
         ->name('voter.')
         ->group(function () {
-            Route::get('/dashboard', fn () => view('voter.dashboard'))->name('dashboard');
+            Route::get('/dashboard', [VoterDashboardController::class, 'index'])->name('dashboard');
 
             Route::get('/vote', [VoteController::class, 'index'])->name('vote.index');
-            Route::post('/vote', [VoteController::class, 'store'])->name('vote.store');
-            Route::get('/vote/{election}', [VoteController::class, 'show'])->name('vote.show');
-            Route::post('/vote', [VoteController::class, 'submit'])->name('vote.submit');
+            Route::get('/vote/{election}', [VoteController::class, 'show'])->name('vote.create');
+            Route::get('/vote/{election}/candidate/{candidate}', [VoteController::class, 'candidateProfile'])->name('vote.candidate.show');
+            Route::post('/vote', [VoteController::class, 'submit'])->middleware('throttle:vote-submit')->name('vote.submit');
 
-            Route::get('/results/{election}', [ResultController::class, 'show'])->name('results.show');
+            Route::get('/results/{election}', [PublicResultController::class, 'showVoter'])->name('results.show');
 
         });
 
@@ -115,4 +160,3 @@ Route::middleware(['auth', 'role:admin'])
 });
 
 require __DIR__.'/auth.php';
-

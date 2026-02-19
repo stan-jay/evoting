@@ -17,6 +17,10 @@ class RoleMiddleware
             abort(403);
         }
 
+        if (auth()->user()->status !== 'active') {
+            abort(403);
+        }
+
         return $next($request);
     }
 }

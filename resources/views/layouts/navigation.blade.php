@@ -1,113 +1,146 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+<nav x-data="{ open: false }" class="bg-white border-b border-gray-200 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <!-- Left -->
-            <div class="flex">
-                <!-- Logo -->
-                <div class="shrink-0 flex items-center">
+        <div class="flex justify-between h-16 items-center">
+
+            {{-- Left: Logo + Desktop Nav --}}
+            <div class="flex items-center space-x-8">
+                <a href="{{ Route::has('home') ? route('home') : url('/') }}" class="text-lg font-bold text-blue-600 hover:text-blue-700 transition">
+                    {{ config('app.name', 'E-Voting') }}
+                </a>
+
+                <div class="hidden lg:flex lg:space-x-1">
                     @auth
-                        @php
-                            $dashboardRoute = match(auth()->user()->role) {
-                                'admin'   => 'admin.dashboard',
-                                'officer' => 'officer.dashboard',
-                                default   => 'voter.dashboard',
-                            };
-                        @endphp
+                        @php $role = optional(Auth::user())->role; @endphp
 
-                        <a href="{{ route($dashboardRoute) }}">
-                            <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
-                        </a>
+                        @if($role === 'super_admin')
+                            <a href="{{ route('super_admin.dashboard') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">Organizations</a>
+                            <a href="{{ route('super_admin.users.index') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">Users</a>
+                            <a href="{{ route('super_admin.docs.show') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">Docs</a>
+                        @elseif($role === 'admin')
+                            <a href="{{ Route::has('admin.dashboard') ? route('admin.dashboard') : url('/admin/dashboard') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">Dashboard</a>
+                            <a href="{{ route('admin.users.index') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">Users</a>
+                            <a href="{{ Route::has('admin.elections.index') ? route('admin.elections.index') : url('/admin/elections') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">Elections</a>
+                            <a href="{{ Route::has('admin.candidates.approval') ? route('admin.candidates.approval') : url('/admin/candidates/approval') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">Candidates</a>
+                            <a href="{{ Route::has('admin.results.index') ? route('admin.results.index') : url('/admin/results') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">Results</a>
+                            <a href="{{ route('admin.invites.index') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">Invites</a>
+                            <a href="{{ Route::has('admin.audit.logs') ? route('admin.audit.logs') : url('/admin/audit') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">Audit</a>
+                        @elseif($role === 'officer')
+                            <a href="{{ Route::has('officer.dashboard') ? route('officer.dashboard') : url('/officer/dashboard') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">Dashboard</a>
+                            <a href="{{ Route::has('officer.positions.index') ? route('officer.positions.index') : url('/officer/positions') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">Positions</a>
+                            <a href="{{ Route::has('officer.candidates.create') ? route('officer.candidates.create') : url('/officer/candidates/create') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">Add Candidate</a>
+                            <a href="{{ Route::has('officer.candidates.index') ? route('officer.candidates.index') : url('/officer/candidates') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">My Candidates</a>
+                        @else
+                            <a href="{{ Route::has('voter.dashboard') ? route('voter.dashboard') : url('/dashboard') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">Dashboard</a>
+                            <a href="{{ Route::has('elections.index') ? route('elections.index') : url('/elections') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">Elections</a>
+                            <a href="{{ Route::has('voter.results.index') ? route('voter.results.index') : url('/results') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">Results</a>
+                        @endif
                     @endauth
-                </div>
 
-                <!-- Desktop Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route($dashboardRoute)">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
+                    @guest
+                        <a href="{{ Route::has('home') ? route('home') : url('/') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">Home</a>
+                    @endguest
                 </div>
             </div>
 
-            <!-- Right (Desktop) -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-gray-500 bg-white hover:text-gray-700">
-                            {{ Auth::user()->name }}
-                            <svg class="ml-1 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                            </svg>
-                        </button>
-                    </x-slot>
+            {{-- Right: Profile + Auth --}}
+            <div class="flex items-center space-x-2 sm:space-x-4">
+                @auth
+                    <div class="hidden sm:flex items-center space-x-3">
+                        <span class="text-sm text-gray-700 font-medium truncate max-w-[200px]">{{ Auth::user()->name }}</span>
+                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-xs font-bold text-blue-600 flex-shrink-0">
+                            {{ substr(Auth::user()->name, 0, 1) }}
+                        </div>
+                    </div>
 
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
-                            Profile
-                        </x-dropdown-link>
+                    @if(Route::has('profile.edit'))
+                        <a href="{{ route('profile.edit') }}" class="hidden sm:inline-block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded transition">Profile</a>
+                    @endif
 
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <x-dropdown-link
-                                :href="route('logout')"
-                                onclick="event.preventDefault(); this.closest('form').submit();">
-                                Log Out
-                            </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
-            </div>
+                    <form method="POST" action="{{ Route::has('logout') ? route('logout') : url('/logout') }}" class="hidden sm:block">
+                        @csrf
+                        <button type="submit" class="px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded transition">Logout</button>
+                    </form>
+                @endauth
 
-            <!-- Hamburger (Mobile) -->
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = !open"
-                        class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{ 'hidden': open, 'inline-flex': !open }"
-                              class="inline-flex"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{ 'hidden': !open, 'inline-flex': open }"
-                              class="hidden"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M6 18L18 6M6 6l12 12" />
+                @guest
+                    <div class="hidden sm:flex sm:space-x-2">
+                        @if(Route::has('login'))
+                            <a href="{{ route('login') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">Login</a>
+                        @endif
+
+                        <span class="px-3 py-2 text-sm text-gray-500">Invite-only signup</span>
+                    </div>
+                @endguest
+
+                {{-- Mobile Menu Button --}}
+                <button @click="open = !open" type="button" class="lg:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                    <svg x-show="!open" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                    <svg x-show="open" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
             </div>
+
         </div>
     </div>
 
-    <!-- Mobile Menu -->
-    <div x-show="open" class="sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route($dashboardRoute)">
-                Dashboard
-            </x-responsive-nav-link>
-        </div>
+    {{-- Mobile Menu --}}
+    <div x-show="open" x-cloak class="lg:hidden border-t border-gray-100 bg-white max-h-[calc(100vh-64px)] overflow-y-auto">
+        <div class="px-2 pt-2 pb-3 space-y-1">
+            @auth
+                <div class="px-3 py-3 flex items-center space-x-2 border-b border-gray-100">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-xs font-bold text-blue-600 flex-shrink-0">
+                        {{ substr(Auth::user()->name, 0, 1) }}
+                    </div>
+                    <span class="text-sm font-medium text-gray-800 truncate">{{ Auth::user()->name }}</span>
+                </div>
 
-        <div class="pt-4 pb-1 border-t border-gray-200">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
-            </div>
+                @php $role = optional(Auth::user())->role; @endphp
 
-            <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
-                    Profile
-                </x-responsive-nav-link>
+                @if($role === 'super_admin')
+                    <a @click="open = false" href="{{ route('super_admin.dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Organizations</a>
+                    <a @click="open = false" href="{{ route('super_admin.users.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Users</a>
+                    <a @click="open = false" href="{{ route('super_admin.docs.show') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Docs</a>
+                @elseif($role === 'admin')
+                    <a @click="open = false" href="{{ Route::has('admin.dashboard') ? route('admin.dashboard') : url('/admin/dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Dashboard</a>
+                    <a @click="open = false" href="{{ route('admin.users.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Users</a>
+                    <a @click="open = false" href="{{ Route::has('admin.elections.index') ? route('admin.elections.index') : url('/admin/elections') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Elections</a>
+                    <a @click="open = false" href="{{ Route::has('admin.candidates.approval') ? route('admin.candidates.approval') : url('/admin/candidates/approval') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Candidates</a>
+                    <a @click="open = false" href="{{ Route::has('admin.results.index') ? route('admin.results.index') : url('/admin/results') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Results</a>
+                    <a @click="open = false" href="{{ route('admin.invites.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Invites</a>
+                    <a @click="open = false" href="{{ Route::has('admin.audit.logs') ? route('admin.audit.logs') : url('/admin/audit') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Audit</a>
+                @elseif($role === 'officer')
+                    <a @click="open = false" href="{{ Route::has('officer.dashboard') ? route('officer.dashboard') : url('/officer/dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Dashboard</a>
+                    <a @click="open = false" href="{{ Route::has('officer.positions.index') ? route('officer.positions.index') : url('/officer/positions') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Positions</a>
+                    <a @click="open = false" href="{{ Route::has('officer.candidates.create') ? route('officer.candidates.create') : url('/officer/candidates/create') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Add Candidate</a>
+                    <a @click="open = false" href="{{ Route::has('officer.candidates.index') ? route('officer.candidates.index') : url('/officer/candidates') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">My Candidates</a>
+                @else
+                    <a @click="open = false" href="{{ Route::has('voter.dashboard') ? route('voter.dashboard') : url('/dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Dashboard</a>
+                    <a @click="open = false" href="{{ Route::has('elections.index') ? route('elections.index') : url('/elections') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Elections</a>
+                    <a @click="open = false" href="{{ Route::has('voter.results.index') ? route('voter.results.index') : url('/results') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Results</a>
+                @endif
 
-                <form method="POST" action="{{ route('logout') }}">
+                @if(Route::has('profile.edit'))
+                    <a @click="open = false" href="{{ route('profile.edit') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Profile</a>
+                @endif
+
+                <form method="POST" action="{{ Route::has('logout') ? route('logout') : url('/logout') }}" @submit="open = false">
                     @csrf
-                    <x-responsive-nav-link
-                        :href="route('logout')"
-                        onclick="event.preventDefault(); this.closest('form').submit();">
-                        Log Out
-                    </x-responsive-nav-link>
+                    <button type="submit" class="w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50 transition">Logout</button>
                 </form>
-            </div>
+            @endauth
+
+            @guest
+                <a @click="open = false" href="{{ Route::has('home') ? route('home') : url('/') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Home</a>
+
+                @if(Route::has('login'))
+                    <a @click="open = false" href="{{ route('login') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Login</a>
+                @endif
+
+                <span class="block px-3 py-2 text-sm text-gray-500">Signup is invite-only</span>
+            @endguest
         </div>
     </div>
 </nav>

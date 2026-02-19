@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Election;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
 
 class ElectionController extends Controller
 {
@@ -73,7 +72,7 @@ class ElectionController extends Controller
 
     $election->update([
         'status' => 'active',
-        'start_at' => now(),
+        'start_time' => now(),
     ]);
 
     return back()->with('success', 'Election started.');
@@ -87,7 +86,7 @@ public function start(Election $election)
 
     $election->update([
         'status' => 'active',
-        'start_at' => now(),
+        'start_time' => now(),
     ]);
 
     return back()->with('success', 'Election started successfully.');
@@ -101,7 +100,7 @@ public function close(Election $election)
 
     $election->update([
         'status' => 'closed',
-        'end_at' => now(),
+        'end_time' => now(),
     ]);
 
     return back()->with('success', 'Election closed and results locked.');

@@ -17,6 +17,18 @@ class PositionController extends Controller
         return view('officer.positions.index', compact('positions', 'elections'));
     }
 
+    public function create()
+    {
+        $elections = Election::where('status', '!=', 'closed')->get();
+
+        return view('officer.positions.create', compact('elections'));
+    }
+
+    public function show(Position $position)
+    {
+        return redirect()->route('officer.positions.edit', $position);
+    }
+
     public function store(Request $request)
     {
         $request->validate([

@@ -1,59 +1,118 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Evoting Platform
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Evoting is a multi-tenant Laravel election platform for campuses and organizations.
+A single deployment serves many institutions, with strict organization-level data isolation.
 
-## About Laravel
+## Core Capabilities
+- Multi-tenant organization onboarding (super admin)
+- Invite-only registration (organization-bound tokens)
+- Role-based access: `super_admin`, `admin`, `officer`, `voter`
+- Election lifecycle: pending -> active -> closed -> declared
+- Result analytics with charts (admin/officer)
+- Result publication gating (voters see only when declared)
+- PDF and Excel (CSV) exports for closed/declared elections
+- Auditable vote logging
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Tenant Isolation Model
+All sensitive entities are organization-scoped:
+- `users`, `elections`, `positions`, `candidates`, `votes`, `vote_audits`, `organization_invites`
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Isolation is enforced by:
+1. `organization_id` on core records
+2. model-level tenant global scopes
+3. role + route authorization
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Dashboard Matrix
+- Super Admin Dashboard: organization onboarding, global user intervention, docs
+- Admin Dashboard: manage elections/users/candidates/results/invites within organization
+- Officer Dashboard: manage positions/candidates and see analytics
+- Voter Dashboard: vote and see published results
 
-## Learning Laravel
+## Results Rules
+- Admin/officer can view analytics while election is `active`, `closed`, or `declared`
+- Voters can view results only when election is `declared`
+- Admin can publish (`closed -> declared`) and unpublish (`declared -> closed`)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Candidate Ballot UX
+- Ballot remains compact for voters
+- Candidate cards show name + image thumbnail
+- Manifesto/details are on a linked profile page
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Invite-Only Registration
+- New users join via `/register/{token}` only
+- Invite token binds user to organization and role
+- Invite sending is queued (`SendOrganizationInviteJob`)
 
-## Laravel Sponsors
+## Security and Hardening
+### Rate Limits
+- Vote submission: `throttle:vote-submit`
+- Invite create/resend: `throttle:invite-create`
+- Live analytics polling: `throttle:results-live`
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Graceful DB Failure
+Database connection failures are converted to a clean `503` page (`DB_UNAVAILABLE`) instead of raw `500`.
 
-### Premium Partners
+### Recommended Runtime
+- `APP_ENV=production`
+- `APP_DEBUG=false`
+- `SESSION_DRIVER=database|redis`
+- `QUEUE_CONNECTION=database|redis`
+- Run queue worker continuously
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Backups
+### Command
+```bash
+php artisan app:backup-db --retention=14
+```
+Creates DB backup into `storage/app/backups` and prunes old files.
 
-## Contributing
+### Scheduler
+- daily env sanity check
+- daily DB backup
+- election status updater every minute
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Run scheduler (production):
+```bash
+php artisan schedule:work
+```
 
-## Code of Conduct
+## Environment Sanity Check
+### Command
+```bash
+php artisan app:env-sanity-check
+php artisan app:env-sanity-check --strict
+```
+Checks critical production env settings and mail/db basics.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Deployment Checklist
+1. Set production env values in `.env`
+2. Rotate secrets and mail credentials
+3. Run migrations:
+```bash
+php artisan migrate --force
+```
+4. Build and cache:
+```bash
+php artisan optimize
+```
+5. Start workers:
+```bash
+php artisan queue:work --tries=3
+php artisan schedule:work
+```
+6. Validate health:
+- login for each role
+- vote flow
+- publish/unpublish results
+- export PDF/Excel
+- invite creation and email sending
 
-## Security Vulnerabilities
+## Super Admin Docs Access
+In-app documentation is available only through super admin routes:
+- `super_admin.docs.show` (`/super-admin/docs`)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Test Suite
+Run all tests:
+```bash
+php artisan test
+```

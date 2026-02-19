@@ -17,16 +17,37 @@ class CandidateController extends Controller
         return view('officer.candidates.index', compact('candidates', 'positions'));
     }
 
+    public function create()
+    {
+        $positions = Position::with('election')->get();
+
+        return view('officer.candidates.create', compact('positions'));
+    }
+
+    public function show(Candidate $candidate)
+    {
+        return redirect()->route('officer.candidates.edit', $candidate);
+    }
+
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string',
             'position_id' => 'required|exists:positions,id',
+            'manifesto' => 'nullable|string',
+            'photo' => 'nullable|image|max:2048',
         ]);
+
+        $photoPath = null;
+        if ($request->hasFile('photo')) {
+            $photoPath = $request->file('photo')->store('candidates', 'public');
+        }
 
         Candidate::create([
             'name' => $request->name,
             'position_id' => $request->position_id,
+            'manifesto' => $request->manifesto,
+            'photo' => $photoPath,
             'status' => 'pending',
         ]);
 
@@ -42,9 +63,20 @@ class CandidateController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
+            'manifesto' => 'nullable|string',
+            'photo' => 'nullable|image|max:2048',
         ]);
 
-        $candidate->update(['name' => $request->name]);
+        $data = [
+            'name' => $request->name,
+            'manifesto' => $request->manifesto,
+        ];
+
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $request->file('photo')->store('candidates', 'public');
+        }
+
+        $candidate->update($data);
 
         return redirect()->route('officer.candidates.index')
             ->with('success', 'Candidate updated.');

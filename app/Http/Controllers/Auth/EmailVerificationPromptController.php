@@ -10,11 +10,7 @@ class EmailVerificationPromptController extends Controller
     public function __invoke(Request $request)
     {
         if ($request->user()->hasVerifiedEmail()) {
-            return match ($request->user()->role) {
-                'admin'   => redirect()->route('admin.dashboard'),
-                'officer' => redirect()->route('officer.dashboard'),
-                default   => redirect()->route('voter.dashboard'),
-            };
+            return redirect()->route('dashboard');
         }
 
         return view('auth.verify-email');
