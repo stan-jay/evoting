@@ -32,8 +32,8 @@
                             <a href="{{ Route::has('officer.candidates.index') ? route('officer.candidates.index') : url('/officer/candidates') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">My Candidates</a>
                         @else
                             <a href="{{ Route::has('voter.dashboard') ? route('voter.dashboard') : url('/dashboard') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">Dashboard</a>
-                            <a href="{{ Route::has('elections.index') ? route('elections.index') : url('/elections') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">Elections</a>
-                            <a href="{{ Route::has('voter.results.index') ? route('voter.results.index') : url('/results') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">Results</a>
+                            <a href="{{ route('voter.vote.index') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">Elections</a>
+                            <a href="{{ route('voter.results.index') }}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition">Results</a>
                         @endif
                     @endauth
 
@@ -119,8 +119,8 @@
                     <a @click="open = false" href="{{ Route::has('officer.candidates.index') ? route('officer.candidates.index') : url('/officer/candidates') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">My Candidates</a>
                 @else
                     <a @click="open = false" href="{{ Route::has('voter.dashboard') ? route('voter.dashboard') : url('/dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Dashboard</a>
-                    <a @click="open = false" href="{{ Route::has('elections.index') ? route('elections.index') : url('/elections') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Elections</a>
-                    <a @click="open = false" href="{{ Route::has('voter.results.index') ? route('voter.results.index') : url('/results') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Results</a>
+                    <a @click="open = false" href="{{ route('voter.vote.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Elections</a>
+                    <a @click="open = false" href="{{ route('voter.results.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition">Results</a>
                 @endif
 
                 @if(Route::has('profile.edit'))
@@ -145,3 +145,4 @@
         </div>
     </div>
 </nav>
+

@@ -6,7 +6,7 @@
         'items' => [
             ['label' => 'Home', 'url' => route('home')],
             ['label' => 'Dashboard', 'url' => Route::has('voter.dashboard') ? route('voter.dashboard') : url('/dashboard')],
-            ['label' => $election->title, 'url' => Route::has('elections.show') ? route('elections.show', $election) : url('/elections/'.$election->id)],
+            ['label' => $election->title],
             ['label' => 'Results'],
         ]
     ])
@@ -62,8 +62,8 @@
     </div>
 
     <div class="flex flex-wrap gap-3 justify-between">
-        <a href="{{ Route::has('elections.show') ? route('elections.show', $election) : url('/elections/'.$election->id) }}" class="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50 transition">
-            &larr; Back to Election
+        <a href="{{ route('voter.results.index') }}" class="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50 transition">
+            &larr; Back to Results
         </a>
         <a href="{{ Route::has('voter.dashboard') ? route('voter.dashboard') : url('/dashboard') }}" class="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50 transition">
             &larr; Back to Dashboard

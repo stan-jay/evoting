@@ -30,7 +30,7 @@ class VoteController extends Controller
      */
     public function show(Election $election)
     {
-        if ($election->status !== 'active' || now()->lt($election->start_time) || now()->gt($election->end_time)) {
+        if ($election->status !== 'active') {
             return redirect()
                 ->route('voter.dashboard')
                 ->with('error', 'Voting is not active for this election.');
@@ -47,7 +47,7 @@ class VoteController extends Controller
 
     public function candidateProfile(Election $election, Candidate $candidate)
     {
-        if ($election->status !== 'active' || now()->lt($election->start_time) || now()->gt($election->end_time)) {
+        if ($election->status !== 'active') {
             return redirect()
                 ->route('voter.dashboard')
                 ->with('error', 'Candidate details are unavailable outside active voting window.');
@@ -83,11 +83,7 @@ class VoteController extends Controller
                     ->lockForUpdate()
                     ->findOrFail((int) $request->input('election_id'));
 
-                if (
-                    $election->status !== 'active'
-                    || now()->lt($election->start_time)
-                    || now()->gt($election->end_time)
-                ) {
+                if ($election->status !== 'active') {
                     throw ValidationException::withMessages([
                         'election_id' => 'This election is not accepting votes right now.',
                     ]);

@@ -28,6 +28,13 @@ Route::get('/', function () {
 Route::middleware(['auth', 'active'])->get('/dashboard', DashboardController::class)->name('dashboard');
 
 Route::middleware(['auth', 'active'])->group(function () {
+    // Backward-compatible voter shortcuts for legacy links.
+    Route::middleware('role:voter')->group(function () {
+        Route::get('/elections', fn () => redirect()->route('voter.vote.index'))->name('elections.index');
+        Route::get('/elections/{election}', fn (\App\Models\Election $election) => redirect()->route('voter.vote.create', $election))->name('elections.show');
+        Route::get('/results', fn () => redirect()->route('voter.results.index'))->name('results.index');
+    });
+
     // SUPER ADMIN
     Route::middleware(['auth', 'role:super_admin'])
         ->prefix('super-admin')
@@ -149,6 +156,7 @@ Route::middleware(['auth', 'role:admin'])
             Route::get('/vote/{election}/candidate/{candidate}', [VoteController::class, 'candidateProfile'])->name('vote.candidate.show');
             Route::post('/vote', [VoteController::class, 'submit'])->middleware('throttle:vote-submit')->name('vote.submit');
 
+            Route::get('/results', [PublicResultController::class, 'indexVoter'])->name('results.index');
             Route::get('/results/{election}', [PublicResultController::class, 'showVoter'])->name('results.show');
 
         });

@@ -11,6 +11,16 @@ use Illuminate\View\View;
 
 class PublicResultController extends Controller
 {
+    public function indexVoter(): View
+    {
+        $elections = Election::query()
+            ->where('status', 'declared')
+            ->orderByDesc('end_time')
+            ->get();
+
+        return view('voter.results.index', compact('elections'));
+    }
+
     public function showVoter(Election $election): View
     {
         $this->ensurePublishedForVoters($election);
