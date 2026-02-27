@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
+use Throwable;
 
 class InviteController extends Controller
 {
@@ -36,6 +37,8 @@ class InviteController extends Controller
 
         $expiresAt = now()->addDays((int) ($validated['expires_in_days'] ?? 7));
         $createdCount = 0;
+        $sentCount = 0;
+        $failedCount = 0;
 
         foreach ($emails as $email) {
             $exists = OrganizationInvite::query()
@@ -54,11 +57,24 @@ class InviteController extends Controller
                 'expires_at' => $expiresAt,
             ]);
 
-            SendOrganizationInviteJob::dispatch($invite->id);
             $createdCount++;
+
+            try {
+                SendOrganizationInviteJob::dispatchSync($invite->id);
+                $sentCount++;
+            } catch (Throwable $e) {
+                $failedCount++;
+                $invite->forceFill([
+                    'send_error' => str($e->getMessage())->limit(1000)->toString(),
+                ])->save();
+            }
         }
 
-        return back()->with('success', $createdCount . ' invite(s) queued for email delivery.');
+        if ($failedCount > 0) {
+            return back()->with('error', "Created {$createdCount} invite(s). {$sentCount} sent, {$failedCount} failed (see Error column).");
+        }
+
+        return back()->with('success', "Created {$createdCount} invite(s). {$sentCount} sent.");
     }
 
     public function resend(OrganizationInvite $invite): RedirectResponse
@@ -71,9 +87,17 @@ class InviteController extends Controller
         $invite->send_error = null;
         $invite->save();
 
-        SendOrganizationInviteJob::dispatch($invite->id);
+        try {
+            SendOrganizationInviteJob::dispatchSync($invite->id);
 
-        return back()->with('success', 'Invite refreshed and queued for resend.');
+            return back()->with('success', 'Invite refreshed and sent.');
+        } catch (Throwable $e) {
+            $invite->forceFill([
+                'send_error' => str($e->getMessage())->limit(1000)->toString(),
+            ])->save();
+
+            return back()->with('error', 'Invite refreshed, but sending failed. Check Error column.');
+        }
     }
 
     private function extractEmails(string $raw): Collection

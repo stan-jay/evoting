@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Throwable;
 
 class OrganizationController extends Controller
 {
@@ -49,11 +50,20 @@ class OrganizationController extends Controller
             'expires_at' => now()->addDays(7),
         ]);
 
-        SendOrganizationInviteJob::dispatch($invite->id);
-
         $link = route('register', ['token' => $invite->token]);
 
-        return back()->with('success', 'Organization created and admin invite queued. Fallback invite link: ' . $link);
+        try {
+            // Shared hosting often has no running queue worker; send immediately.
+            SendOrganizationInviteJob::dispatchSync($invite->id);
+
+            return back()->with('success', 'Organization created and admin invite sent. Invite link: ' . $link);
+        } catch (Throwable $e) {
+            $invite->forceFill([
+                'send_error' => str($e->getMessage())->limit(1000)->toString(),
+            ])->save();
+
+            return back()->with('error', 'Organization created, but invite email failed to send. Invite link: ' . $link);
+        }
     }
 
     public function destroy(Organization $organization): RedirectResponse

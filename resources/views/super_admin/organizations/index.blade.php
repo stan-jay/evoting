@@ -16,20 +16,24 @@
         <form method="POST" action="{{ route('super_admin.organizations.store') }}" class="grid gap-4 md:grid-cols-2">
             @csrf
             <div>
-                <label class="block text-sm font-medium text-gray-700">Organization Name</label>
-                <input name="name" value="{{ old('name') }}" class="mt-1 w-full border rounded px-3 py-2" required>
+                <label class="block text-sm font-medium text-gray-700" for="name">Organization Name</label>
+                <input id="name" name="name" value="{{ old('name') }}" class="mt-1 w-full border rounded px-3 py-2" required>
+                @error('name')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700">Slug (optional)</label>
-                <input name="slug" value="{{ old('slug') }}" class="mt-1 w-full border rounded px-3 py-2">
+                <label class="block text-sm font-medium text-gray-700" for="slug">Slug (optional)</label>
+                <input id="slug" name="slug" value="{{ old('slug') }}" class="mt-1 w-full border rounded px-3 py-2">
+                @error('slug')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700">Admin Email</label>
-                <input type="email" name="admin_email" value="{{ old('admin_email') }}" class="mt-1 w-full border rounded px-3 py-2" required>
+                <label class="block text-sm font-medium text-gray-700" for="admin_email">Admin Email</label>
+                <input id="admin_email" type="email" name="admin_email" value="{{ old('admin_email') }}" class="mt-1 w-full border rounded px-3 py-2" required>
+                @error('admin_email')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700">Admin Name (optional)</label>
-                <input name="admin_name" value="{{ old('admin_name') }}" class="mt-1 w-full border rounded px-3 py-2">
+                <label class="block text-sm font-medium text-gray-700" for="admin_name">Admin Name (optional)</label>
+                <input id="admin_name" name="admin_name" value="{{ old('admin_name') }}" class="mt-1 w-full border rounded px-3 py-2">
+                @error('admin_name')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
             </div>
             <div class="md:col-span-2">
                 <button class="px-4 py-2 rounded bg-blue-600 text-white">Create Organization & Admin Invite</button>
