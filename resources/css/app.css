@@ -1,3 +1,239 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    :root {
+        --ui-primary: #1e3a8a;
+        --ui-primary-strong: #172554;
+        --ui-success: #3f6f57;
+        --ui-warning: #b7791f;
+        --ui-danger: #b91c1c;
+        --ui-surface: #ffffff;
+        --ui-bg: #f8fafc;
+        --ui-bg-muted: #eef2f7;
+        --ui-border: #dbe3ef;
+        --ui-text: #0f172a;
+        --ui-text-muted: #475569;
+    }
+
+    body {
+        @apply bg-slate-50 text-slate-900 antialiased;
+        background-color: var(--ui-bg);
+        color: var(--ui-text);
+    }
+
+    h1, h2, h3 {
+        @apply tracking-tight text-slate-900;
+    }
+}
+
+@layer components {
+    .app-shell {
+        @apply min-h-screen flex flex-col bg-slate-50;
+        background: linear-gradient(180deg, #f8fafc 0%, #eef3f9 100%);
+    }
+
+    .page-wrap {
+        @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+    }
+
+    .page-stack {
+        @apply space-y-6 md:space-y-8;
+    }
+
+    .page-hero {
+        @apply rounded-xl border px-6 py-6 md:px-8 md:py-7;
+        border-color: var(--ui-border);
+        background: linear-gradient(135deg, #ffffff 0%, #f7f9fc 100%);
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+    }
+
+    .page-title {
+        @apply text-3xl md:text-4xl font-bold;
+    }
+
+    .page-subtitle {
+        @apply mt-2 text-sm md:text-base;
+        color: var(--ui-text-muted);
+    }
+
+    .section-card {
+        @apply rounded-xl border bg-white p-6 md:p-7;
+        border-color: var(--ui-border);
+        box-shadow: 0 4px 18px rgba(15, 23, 42, 0.03);
+    }
+
+    .section-title {
+        @apply text-xl font-semibold;
+    }
+
+    .section-subtitle {
+        @apply mt-1 text-sm;
+        color: var(--ui-text-muted);
+    }
+
+    .section-divider {
+        @apply border-t pt-6;
+        border-color: var(--ui-border);
+    }
+
+    .kpi-grid {
+        @apply grid gap-4 md:grid-cols-2 xl:grid-cols-4;
+    }
+
+    .kpi-card {
+        @apply rounded-xl border bg-white p-5;
+        border-color: var(--ui-border);
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+    }
+
+    .kpi-icon {
+        @apply inline-flex h-10 w-10 items-center justify-center rounded-lg text-sm font-semibold;
+        background-color: #dbeafe;
+        color: var(--ui-primary);
+    }
+
+    .kpi-label {
+        @apply mt-4 text-sm font-medium;
+        color: var(--ui-text-muted);
+    }
+
+    .kpi-value {
+        @apply mt-2 text-4xl font-bold leading-none;
+    }
+
+    .data-table {
+        @apply w-full text-sm;
+    }
+
+    .data-table thead {
+        @apply border-b;
+        border-color: var(--ui-border);
+    }
+
+    .data-table th {
+        @apply py-3 font-semibold text-slate-700;
+    }
+
+    .data-table td {
+        @apply py-4 align-top;
+        color: var(--ui-text-muted);
+    }
+
+    .data-row {
+        @apply rounded-xl border bg-white px-5 py-4;
+        border-color: var(--ui-border);
+    }
+
+    .btn-primary {
+        @apply inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition-colors;
+        background-color: var(--ui-primary);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--ui-primary-strong);
+    }
+
+    .btn-secondary {
+        @apply inline-flex items-center justify-center rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors;
+        border-color: var(--ui-border);
+        color: var(--ui-primary);
+        background-color: #ffffff;
+    }
+
+    .btn-secondary:hover {
+        background-color: #f8fafc;
+    }
+
+    .btn-tertiary {
+        @apply inline-flex items-center justify-center px-2 py-2 text-sm font-semibold transition-colors;
+        color: var(--ui-primary);
+    }
+
+    .btn-tertiary:hover {
+        color: var(--ui-primary-strong);
+    }
+
+    .btn-danger {
+        @apply inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition-colors;
+        background-color: var(--ui-danger);
+    }
+
+    .btn-danger:hover {
+        background-color: #991b1b;
+    }
+
+    .form-label {
+        @apply block text-sm font-medium text-slate-700;
+    }
+
+    .form-input {
+        @apply mt-1 w-full rounded-lg border px-3 py-2.5 text-sm text-slate-900 outline-none transition;
+        border-color: var(--ui-border);
+        background-color: #ffffff;
+    }
+
+    .form-input:focus {
+        border-color: #93c5fd;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    }
+
+    .status-badge {
+        @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold;
+    }
+
+    .status-active {
+        @apply bg-blue-100 text-blue-800;
+    }
+
+    .status-pending {
+        @apply bg-amber-100 text-amber-800;
+    }
+
+    .status-closed {
+        @apply bg-slate-200 text-slate-700;
+    }
+
+    .status-declared {
+        @apply bg-emerald-100 text-emerald-800;
+    }
+
+    .ballot-position {
+        @apply rounded-xl border bg-white p-6 md:p-7;
+        border-color: var(--ui-border);
+        box-shadow: 0 4px 18px rgba(15, 23, 42, 0.03);
+    }
+
+    .candidate-grid {
+        @apply grid gap-4 md:grid-cols-2;
+    }
+
+    .candidate-option {
+        @apply relative block cursor-pointer rounded-xl border p-5 transition-all;
+        border-color: var(--ui-border);
+        background-color: #ffffff;
+    }
+
+    .candidate-option:hover {
+        border-color: #93c5fd;
+        box-shadow: 0 8px 20px rgba(30, 58, 138, 0.08);
+    }
+
+    .candidate-option input {
+        @apply sr-only;
+    }
+
+    .candidate-option:has(input:checked) {
+        border-color: #1d4ed8;
+        background-color: #eff6ff;
+        box-shadow: inset 0 0 0 1px #1d4ed8;
+    }
+
+    .sticky-submit-bar {
+        @apply sticky bottom-4 z-40 rounded-xl border bg-white/95 px-5 py-4 backdrop-blur;
+        border-color: var(--ui-border);
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+    }
+}
+

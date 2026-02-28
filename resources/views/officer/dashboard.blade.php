@@ -1,41 +1,39 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="space-y-6">
+<div class="page-stack max-w-6xl mx-auto">
+    <section class="page-hero">
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Election Operations</p>
+        <h1 class="page-title">Election Officer Dashboard</h1>
+        <p class="page-subtitle">Coordinate position management and candidate administration within a structured workflow.</p>
+    </section>
 
-    <div class="bg-white p-6 rounded shadow">
-        <h1 class="text-2xl font-bold">Election Officer Dashboard</h1>
-        <p class="text-gray-600">Manage positions and candidates.</p>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-white p-5 rounded shadow">
-            <h3 class="text-sm text-gray-500">Total Elections</h3>
-            <p class="text-3xl font-bold">{{ \App\Models\Election::count() }}</p>
+    <section class="kpi-grid md:grid-cols-3 xl:grid-cols-3">
+        <div class="kpi-card">
+            <span class="kpi-icon">EL</span>
+            <p class="kpi-label">Total Elections</p>
+            <p class="kpi-value">{{ \App\Models\Election::count() }}</p>
         </div>
-
-        <div class="bg-white p-5 rounded shadow">
-            <h3 class="text-sm text-gray-500">Positions</h3>
-            <p class="text-3xl font-bold">{{ \App\Models\Position::count() }}</p>
+        <div class="kpi-card">
+            <span class="kpi-icon">PO</span>
+            <p class="kpi-label">Configured Positions</p>
+            <p class="kpi-value">{{ \App\Models\Position::count() }}</p>
         </div>
-
-        <div class="bg-white p-5 rounded shadow">
-            <h3 class="text-sm text-gray-500">Candidates</h3>
-            <p class="text-3xl font-bold">{{ \App\Models\Candidate::count() }}</p>
+        <div class="kpi-card">
+            <span class="kpi-icon">CA</span>
+            <p class="kpi-label">Submitted Candidates</p>
+            <p class="kpi-value">{{ \App\Models\Candidate::count() }}</p>
         </div>
-    </div>
+    </section>
 
-    <div class="flex gap-4">
-        <a href="{{ route('officer.positions.index') }}"
-           class="bg-indigo-600 text-white px-5 py-3 rounded">
-            Manage Positions
-        </a>
+    <section class="section-card">
+        <h2 class="section-title">Primary Actions</h2>
+        <p class="section-subtitle">Manage structured election setup through the dedicated modules below.</p>
 
-        <a href="{{ route('officer.candidates.index') }}"
-           class="bg-green-600 text-white px-5 py-3 rounded">
-            Manage Candidates
-        </a>
-    </div>
-
+        <div class="mt-5 flex flex-col gap-3 md:flex-row">
+            <a href="{{ route('officer.positions.index') }}" class="btn-primary">Manage Positions</a>
+            <a href="{{ route('officer.candidates.index') }}" class="btn-secondary">Manage Candidates</a>
+        </div>
+    </section>
 </div>
 @endsection

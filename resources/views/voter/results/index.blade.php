@@ -1,28 +1,32 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-5xl mx-auto space-y-6">
-    <div class="bg-white p-6 rounded-xl border shadow-sm">
-        <h1 class="text-2xl font-bold">Published Results</h1>
-        <p class="text-gray-600">View election results that have been published.</p>
-    </div>
+<div class="page-stack max-w-5xl mx-auto">
+    <section class="page-hero">
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Published Records</p>
+        <h1 class="page-title">Election Results</h1>
+        <p class="page-subtitle">Only formally declared elections appear in this archive.</p>
+    </section>
 
-    <div class="bg-white p-6 rounded-xl border shadow-sm">
-        <h2 class="text-lg font-semibold mb-4">Elections</h2>
+    <section class="section-card">
+        <h2 class="section-title">Declared Elections</h2>
+        <p class="section-subtitle">Select an election to review the officially published result sheet.</p>
 
-        <div class="space-y-3">
+        <div class="mt-5 space-y-3">
             @forelse($elections as $election)
-                <div class="flex items-center justify-between border rounded-lg px-4 py-3">
-                    <div>
-                        <p class="font-semibold">{{ $election->title }}</p>
-                        <p class="text-sm text-gray-500">Status: {{ ucfirst($election->status) }}</p>
+                <div class="data-row flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div class="space-y-2">
+                        <p class="font-semibold text-slate-900">{{ $election->title }}</p>
+                        <x-status-badge :status="$election->status" />
                     </div>
-                    <a href="{{ route('voter.results.show', $election) }}" class="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition">View Results</a>
+                    <a href="{{ route('voter.results.show', $election) }}" class="btn-secondary">View Results</a>
                 </div>
             @empty
-                <p class="text-gray-500">No published results available yet.</p>
+                <div class="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-5 py-8 text-center text-sm text-slate-500">
+                    No published results are available yet.
+                </div>
             @endforelse
         </div>
-    </div>
+    </section>
 </div>
 @endsection

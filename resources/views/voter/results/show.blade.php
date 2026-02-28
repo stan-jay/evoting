@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="space-y-6">
+<div class="page-stack max-w-6xl mx-auto">
     @include('components.breadcrumbs', [
         'items' => [
             ['label' => 'Home', 'url' => route('home')],
@@ -11,43 +11,48 @@
         ]
     ])
 
-    <div class="bg-white shadow sm:rounded-lg p-6">
-        <h1 class="text-3xl font-semibold text-gray-800">{{ $election->title }} - Published Results</h1>
-        <p class="mt-2 text-sm text-gray-600">These results were officially published by the election admin.</p>
-    </div>
+    <section class="page-hero">
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Declared Outcome</p>
+        <h1 class="page-title">{{ $election->title }} Results</h1>
+        <p class="page-subtitle">This statement reflects the officially published election outcome.</p>
+    </section>
 
-    <div class="grid gap-4 md:grid-cols-2">
-        <div class="bg-white p-4 rounded-xl border shadow-sm">
-            <p class="text-sm text-gray-500">Total Votes</p>
-            <p class="text-2xl font-bold">{{ $summary['total_votes'] }}</p>
+    <section class="kpi-grid md:grid-cols-2 xl:grid-cols-2">
+        <div class="kpi-card">
+            <span class="kpi-icon">TV</span>
+            <p class="kpi-label">Total Votes</p>
+            <p class="kpi-value">{{ $summary['total_votes'] }}</p>
         </div>
-        <div class="bg-white p-4 rounded-xl border shadow-sm">
-            <p class="text-sm text-gray-500">Unique Voters</p>
-            <p class="text-2xl font-bold">{{ $summary['unique_voters'] }}</p>
+        <div class="kpi-card">
+            <span class="kpi-icon">UV</span>
+            <p class="kpi-label">Unique Voters</p>
+            <p class="kpi-value">{{ $summary['unique_voters'] }}</p>
         </div>
-    </div>
+    </section>
 
-    <div class="bg-white p-6 rounded-xl border shadow-sm">
-        <h2 class="text-lg font-semibold mb-4">Voting Trend (Hourly)</h2>
-        <div class="h-72">
+    <section class="section-card">
+        <h2 class="section-title">Voting Trend</h2>
+        <p class="section-subtitle">Hourly ballot volume across the election window.</p>
+        <div class="mt-5 h-72">
             <canvas id="trend-chart"></canvas>
         </div>
-    </div>
+    </section>
 
-    <div class="space-y-6">
+    <section class="page-stack">
         @if(isset($results) && $results->isNotEmpty())
             @foreach($results as $positionName => $candidates)
-                <div class="bg-white shadow sm:rounded-lg p-6">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-4">{{ $positionName }}</h2>
-                    <div class="space-y-3">
+                <div class="section-card">
+                    <h2 class="section-title">{{ $positionName }}</h2>
+                    <div class="mt-4 space-y-3">
                         @foreach($candidates as $candidate)
-                            <div class="flex items-center justify-between border-b pb-3 last:border-b-0">
-                                <div class="flex-1">
-                                    <h3 class="font-semibold text-gray-800">{{ $candidate['name'] }}</h3>
+                            <div class="data-row flex items-center justify-between gap-4">
+                                <div>
+                                    <h3 class="font-semibold text-slate-900">{{ $candidate['name'] }}</h3>
+                                    <p class="text-sm text-slate-500">Official tally for this office.</p>
                                 </div>
                                 <div class="text-right">
-                                    <p class="text-lg font-bold text-blue-600">{{ $candidate['votes'] ?? 0 }}</p>
-                                    <p class="text-sm text-gray-600">{{ $candidate['percentage'] ?? '0' }}%</p>
+                                    <p class="text-2xl font-bold text-blue-800">{{ $candidate['votes'] ?? 0 }}</p>
+                                    <p class="text-sm text-slate-500">{{ $candidate['percentage'] ?? '0' }}%</p>
                                 </div>
                             </div>
                         @endforeach
@@ -55,19 +60,15 @@
                 </div>
             @endforeach
         @else
-            <div class="bg-white shadow sm:rounded-lg p-6 text-center">
-                <p class="text-gray-600">Results not yet available.</p>
+            <div class="section-card text-center text-sm text-slate-500">
+                Results are not available.
             </div>
         @endif
-    </div>
+    </section>
 
     <div class="flex flex-wrap gap-3 justify-between">
-        <a href="{{ route('voter.results.index') }}" class="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50 transition">
-            &larr; Back to Results
-        </a>
-        <a href="{{ Route::has('voter.dashboard') ? route('voter.dashboard') : url('/dashboard') }}" class="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50 transition">
-            &larr; Back to Dashboard
-        </a>
+        <a href="{{ route('voter.results.index') }}" class="btn-secondary">Back to Results</a>
+        <a href="{{ Route::has('voter.dashboard') ? route('voter.dashboard') : url('/dashboard') }}" class="btn-secondary">Back to Dashboard</a>
     </div>
 </div>
 
@@ -91,9 +92,9 @@ document.addEventListener('DOMContentLoaded', function () {
             datasets: [{
                 label: 'Votes per hour',
                 data: trendPayload.data || [],
-                borderColor: '#2563eb',
-                backgroundColor: 'rgba(37, 99, 235, 0.15)',
-                tension: 0.3,
+                borderColor: '#1e3a8a',
+                backgroundColor: 'rgba(30, 58, 138, 0.08)',
+                tension: 0.25,
                 fill: true,
             }]
         },

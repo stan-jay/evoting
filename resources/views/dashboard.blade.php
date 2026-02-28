@@ -1,56 +1,50 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="space-y-6">
-    <div class="bg-white shadow sm:rounded-lg p-6">
-        <h1 class="text-2xl font-semibold text-gray-800">{{ __('Dashboard') }}</h1>
-        <p class="mt-2 text-gray-600">{{ __("You're logged in!") }}</p>
-    </div>
+<div class="page-stack max-w-6xl mx-auto">
+    <section class="page-hero">
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Platform Access</p>
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-subtitle">Access role-specific modules, review your account profile, and continue work within the election platform.</p>
+    </section>
 
-    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <!-- Quick Stats Card -->
-        <div class="bg-white shadow sm:rounded-lg p-6">
-            <h3 class="text-lg font-semibold text-gray-800">Quick Access</h3>
-            <p class="mt-2 text-sm text-gray-600">Navigate to your role-specific dashboard.</p>
-            <div class="mt-4 flex flex-wrap gap-2">
+    <section class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div class="section-card">
+            <h2 class="section-title">Quick Access</h2>
+            <p class="section-subtitle">Open the correct workspace for your assigned responsibilities.</p>
+            <div class="mt-5 flex flex-wrap gap-3">
                 @auth
                     @if(Auth::user()->role === 'admin')
-                        <a href="{{ route('admin.dashboard') }}" class="px-3 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">Admin Dashboard</a>
+                        <a href="{{ route('admin.dashboard') }}" class="btn-primary">Admin Dashboard</a>
                     @elseif(Auth::user()->role === 'officer')
-                        <a href="{{ route('officer.dashboard') }}" class="px-3 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">Officer Dashboard</a>
+                        <a href="{{ route('officer.dashboard') }}" class="btn-primary">Officer Dashboard</a>
                     @else
-                        <a href="{{ route('voter.dashboard') }}" class="px-3 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">Voter Dashboard</a>
+                        <a href="{{ route('voter.dashboard') }}" class="btn-primary">Voter Dashboard</a>
                     @endif
                 @endauth
             </div>
         </div>
 
-        <!-- Profile Card -->
-        <div class="bg-white shadow sm:rounded-lg p-6">
-            <h3 class="text-lg font-semibold text-gray-800">Profile</h3>
+        <div class="section-card">
+            <h2 class="section-title">Profile</h2>
             @auth
-                <p class="mt-2 text-sm text-gray-600">
-                    <strong>Name:</strong> {{ Auth::user()->name }}
-                </p>
-                <p class="mt-1 text-sm text-gray-600">
-                    <strong>Email:</strong> {{ Auth::user()->email }}
-                </p>
-                <p class="mt-1 text-sm text-gray-600">
-                    <strong>Role:</strong> <span class="capitalize font-medium">{{ Auth::user()->role }}</span>
-                </p>
-                <a href="{{ route('profile.edit') }}" class="inline-block mt-4 px-3 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">Edit Profile</a>
+                <div class="mt-4 space-y-3 text-sm text-slate-600">
+                    <p><span class="font-semibold text-slate-800">Name:</span> {{ Auth::user()->name }}</p>
+                    <p><span class="font-semibold text-slate-800">Email:</span> {{ Auth::user()->email }}</p>
+                    <p><span class="font-semibold text-slate-800">Role:</span> <span class="capitalize">{{ str_replace('_', ' ', Auth::user()->role) }}</span></p>
+                </div>
+                <a href="{{ route('profile.edit') }}" class="btn-secondary mt-5">Edit Profile</a>
             @endauth
         </div>
 
-        <!-- Help Card -->
-        <div class="bg-white shadow sm:rounded-lg p-6">
-            <h3 class="text-lg font-semibold text-gray-800">Need Help?</h3>
-            <p class="mt-2 text-sm text-gray-600">Contact support or visit the documentation.</p>
-            <div class="mt-4 flex flex-wrap gap-2">
-                <a href="#" class="px-3 py-2 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50">Documentation</a>
-                <a href="#" class="px-3 py-2 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50">Support</a>
+        <div class="section-card">
+            <h2 class="section-title">Guidance</h2>
+            <p class="section-subtitle">Use documentation and support channels when you need operational clarification.</p>
+            <div class="mt-5 flex flex-wrap gap-3">
+                <a href="#" class="btn-secondary">Documentation</a>
+                <a href="#" class="btn-secondary">Support</a>
             </div>
         </div>
-    </div>
+    </section>
 </div>
 @endsection
