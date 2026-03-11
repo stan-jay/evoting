@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Candidate;
 use App\Models\Position;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class CandidateController extends Controller
 {
@@ -32,15 +35,15 @@ class CandidateController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string',
+            'name' => 'required|string|max:255',
             'position_id' => 'required|exists:positions,id',
             'manifesto' => 'nullable|string',
-            'photo' => 'nullable|image|max:2048',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
         ]);
 
         $photoPath = null;
         if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')->store('candidates', 'public');
+            $photoPath = $this->storePublicCandidatePhoto($request->file('photo'));
         }
 
         Candidate::create([
@@ -62,9 +65,9 @@ class CandidateController extends Controller
     public function update(Request $request, Candidate $candidate)
     {
         $request->validate([
-            'name' => 'required|string',
+            'name' => 'required|string|max:255',
             'manifesto' => 'nullable|string',
-            'photo' => 'nullable|image|max:2048',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
         ]);
 
         $data = [
@@ -73,7 +76,9 @@ class CandidateController extends Controller
         ];
 
         if ($request->hasFile('photo')) {
-            $data['photo'] = $request->file('photo')->store('candidates', 'public');
+            $newPath = $this->storePublicCandidatePhoto($request->file('photo'));
+            $this->deletePublicCandidatePhoto($candidate->photo);
+            $data['photo'] = $newPath;
         }
 
         $candidate->update($data);
@@ -84,8 +89,34 @@ class CandidateController extends Controller
 
     public function destroy(Candidate $candidate)
     {
+        $this->deletePublicCandidatePhoto($candidate->photo);
         $candidate->delete();
 
         return back()->with('success', 'Candidate deleted.');
+    }
+
+    private function storePublicCandidatePhoto(UploadedFile $file): string
+    {
+        $directory = public_path('uploads/candidates');
+        if (! File::exists($directory)) {
+            File::makeDirectory($directory, 0755, true);
+        }
+
+        $filename = Str::uuid()->toString() . '.' . $file->getClientOriginalExtension();
+        $file->move($directory, $filename);
+
+        return 'uploads/candidates/' . $filename;
+    }
+
+    private function deletePublicCandidatePhoto(?string $path): void
+    {
+        if (! $path || ! str_starts_with($path, 'uploads/')) {
+            return;
+        }
+
+        $full = public_path($path);
+        if (File::exists($full)) {
+            File::delete($full);
+        }
     }
 }

@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Voter;
 use App\Http\Controllers\Controller;
 use App\Models\Candidate;
 use App\Models\Election;
+use App\Models\Position;
 use App\Models\Vote;
 use App\Models\VoteAudit;
-use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -36,11 +37,24 @@ class VoteController extends Controller
                 ->with('error', 'Voting is not active for this election.');
         }
 
+        $votedPositionIds = Vote::query()
+            ->where('election_id', $election->id)
+            ->where('user_id', Auth::id())
+            ->pluck('position_id')
+            ->all();
+
         $positions = $election->positions()
+            ->whereNotIn('id', $votedPositionIds)
             ->with(['candidates' => function ($query) {
                 $query->where('status', 'approved')->orderBy('name');
             }])
             ->get();
+
+        if ($positions->isEmpty()) {
+            return redirect()
+                ->route('voter.dashboard')
+                ->with('success', 'You have completed all ballot positions for this election.');
+        }
 
         return view('voter.vote', compact('election', 'positions'));
     }
@@ -73,15 +87,17 @@ class VoteController extends Controller
     {
         $request->validate([
             'election_id' => 'required|exists:elections,id',
-            'votes'       => 'required|array',
-            'votes.*'     => 'required|integer|exists:candidates,id',
+            'votes' => 'required|array|min:1',
+            'votes.*' => 'required|integer|exists:candidates,id',
         ]);
 
+        $electionId = (int) $request->input('election_id');
+
         try {
-            DB::transaction(function () use ($request) {
+            DB::transaction(function () use ($request, $electionId) {
                 $election = Election::query()
                     ->lockForUpdate()
-                    ->findOrFail((int) $request->input('election_id'));
+                    ->findOrFail($electionId);
 
                 if ($election->status !== 'active') {
                     throw ValidationException::withMessages([
@@ -104,18 +120,30 @@ class VoteController extends Controller
                     $candidateId = (int) $candidateId;
 
                     if (
-                        !array_key_exists($positionId, $allowedCandidatesByPosition)
-                        || !in_array($candidateId, $allowedCandidatesByPosition[$positionId], true)
+                        ! array_key_exists($positionId, $allowedCandidatesByPosition)
+                        || ! in_array($candidateId, $allowedCandidatesByPosition[$positionId], true)
                     ) {
                         throw ValidationException::withMessages([
                             "votes.{$positionId}" => 'Invalid candidate selected for this position.',
                         ]);
                     }
 
+                    $alreadyVoted = Vote::query()
+                        ->where('user_id', Auth::id())
+                        ->where('election_id', $election->id)
+                        ->where('position_id', $positionId)
+                        ->exists();
+
+                    if ($alreadyVoted) {
+                        throw ValidationException::withMessages([
+                            "votes.{$positionId}" => 'You have already voted for this position.',
+                        ]);
+                    }
+
                     Vote::create([
-                        'user_id'      => Auth::id(),
-                        'election_id'  => $election->id,
-                        'position_id'  => $positionId,
+                        'user_id' => Auth::id(),
+                        'election_id' => $election->id,
+                        'position_id' => $positionId,
                         'candidate_id' => $candidateId,
                     ]);
 
@@ -135,6 +163,22 @@ class VoteController extends Controller
             }
 
             throw $e;
+        }
+
+        $remaining = Position::query()
+            ->where('election_id', $electionId)
+            ->whereNotIn('id', function ($query) use ($electionId) {
+                $query->select('position_id')
+                    ->from('votes')
+                    ->where('user_id', Auth::id())
+                    ->where('election_id', $electionId);
+            })
+            ->count();
+
+        if ($remaining > 0) {
+            return redirect()
+                ->route('voter.vote.create', $electionId)
+                ->with('success', 'Vote saved. Continue with the remaining positions.');
         }
 
         return redirect()

@@ -38,7 +38,7 @@
 
             <div>
                 <label class="block text-sm font-medium mb-1">Photo (optional)</label>
-                <input type="file" name="photo">
+                <input type="file" name="photo" accept="image/*">`r`n                <p class="mt-1 text-xs text-gray-500">Upload JPG, PNG, or WEBP (max 4MB).</p>
             </div>
 
             <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold">
@@ -49,3 +49,4 @@
 
 </div>
 @endsection
+
