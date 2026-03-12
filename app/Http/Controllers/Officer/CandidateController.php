@@ -120,3 +120,4 @@ class CandidateController extends Controller
         }
     }
 }
+

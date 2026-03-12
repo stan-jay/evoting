@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
 <div class="max-w-6xl mx-auto space-y-6">
@@ -9,7 +9,7 @@
     </div>
 
     <div class="bg-white p-6 rounded-xl border shadow-sm">
-        <form method="POST" action="{{ route('officer.candidates.store') }}" class="flex flex-col md:flex-row gap-4">
+        <form method="POST" action="{{ route('officer.candidates.store') }}" enctype="multipart/form-data" class="flex flex-col md:flex-row gap-4">
             @csrf
             <select name="position_id" class="border px-3 py-2 rounded w-full md:w-auto" required>
                 @foreach($positions as $position)
@@ -20,6 +20,7 @@
             </select>
 
             <input name="name" class="border px-3 py-2 rounded w-full" placeholder="Candidate name" required>
+            <input type="file" name="photo" accept="image/*" class="border px-3 py-2 rounded w-full md:w-auto">
 
             <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                 Add Candidate
@@ -29,9 +30,10 @@
 
     <div class="bg-white p-6 rounded-xl border shadow-sm">
         <div class="overflow-x-auto">
-            <table class="w-full min-w-[640px]">
+            <table class="w-full min-w-[740px]">
                 <thead>
                     <tr class="border-b text-left">
+                        <th class="py-2">Photo</th>
                         <th class="py-2">Candidate</th>
                         <th>Position</th>
                         <th>Election</th>
@@ -42,6 +44,13 @@
                 <tbody>
                     @forelse($candidates as $candidate)
                         <tr class="border-b">
+                            <td class="py-2">
+                                @if(!empty($candidate->photo_url))
+                                    <img src="{{ $candidate->photo_url }}" alt="{{ $candidate->name }}" class="h-10 w-10 rounded object-cover border border-slate-200">
+                                @else
+                                    <div class="h-10 w-10 rounded bg-slate-100 border border-slate-200 text-[10px] text-slate-500 flex items-center justify-center">N/A</div>
+                                @endif
+                            </td>
                             <td class="py-2">{{ $candidate->name }}</td>
                             <td>{{ $candidate->position->name }}</td>
                             <td>{{ $candidate->position->election->title }}</td>
@@ -60,11 +69,15 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-4 text-center text-gray-500">No candidates found.</td>
+                            <td colspan="6" class="py-4 text-center text-gray-500">No candidates found.</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
+        </div>
+
+        <div class="mt-4">
+            {{ $candidates->links() }}
         </div>
     </div>
 

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Concerns\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 class Candidate extends Model
 {
@@ -39,12 +40,15 @@ class Candidate extends Model
             return null;
         }
 
-        // New uploads are saved directly under public/uploads/...
-        if (str_starts_with($this->photo, 'uploads/')) {
-            return asset($this->photo);
+        $photo = str_replace('\\', '/', trim((string) $this->photo));
+        if ($photo === '') {
+            return null;
         }
 
-        // Backward compatibility for older records stored on public disk.
-        return asset('storage/' . ltrim($this->photo, '/'));
+        if (Str::startsWith($photo, ['http://', 'https://'])) {
+            return $photo;
+        }
+
+        return route('media.candidates.photo', $this);
     }
 }

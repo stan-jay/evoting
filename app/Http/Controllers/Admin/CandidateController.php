@@ -16,3 +16,4 @@ class CandidateController extends Controller
         return view('admin.candidates.index', compact('candidates'));
     }
 }
+

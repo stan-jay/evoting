@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\InviteController as AdminInviteController;
 use App\Http\Controllers\SuperAdmin\OrganizationController as SuperAdminOrganizationController;
 use App\Http\Controllers\SuperAdmin\UserInterventionController as SuperAdminUserInterventionController;
 use App\Http\Controllers\SuperAdmin\DocumentationController as SuperAdminDocumentationController;
+use App\Http\Controllers\Media\CandidatePhotoController;
 
 
 Route::get('/', function () {
@@ -28,6 +29,7 @@ Route::get('/', function () {
 Route::middleware(['auth', 'active'])->get('/dashboard', DashboardController::class)->name('dashboard');
 
 Route::middleware(['auth', 'active'])->group(function () {
+    Route::get('/media/candidates/{candidate}/photo', [CandidatePhotoController::class, 'show'])->name('media.candidates.photo');
     // Backward-compatible voter shortcuts for legacy links.
     Route::middleware('role:voter')->group(function () {
         Route::get('/elections', fn () => redirect()->route('voter.vote.index'))->name('elections.index');
@@ -168,3 +170,4 @@ Route::middleware(['auth', 'role:admin'])
 });
 
 require __DIR__.'/auth.php';
+
