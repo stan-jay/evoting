@@ -19,6 +19,7 @@ class DocumentationController extends Controller
             'allow_unsafe_links' => false,
         ]);
 
-        return view('super_admin.docs.show', compact('html'));
+        return view('superadmin.docs.show', compact('html'));
     }
 }
+

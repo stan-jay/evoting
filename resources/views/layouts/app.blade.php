@@ -16,63 +16,60 @@
     $role = auth()->user()->role ?? 'voter';
 
     $menuItems = match ($role) {
+        'super_admin' => [
+            ['key' => 'dashboard', 'label' => 'Dashboard', 'url' => route('superadmin.dashboard'), 'active' => 'superadmin.dashboard'],
+            ['key' => 'elections', 'label' => 'Elections', 'url' => route('superadmin.organizations.index'), 'active' => 'superadmin.organizations.*'],
+            ['key' => 'candidates', 'label' => 'Candidates', 'url' => route('superadmin.users.index'), 'active' => 'superadmin.users.*'],
+            ['key' => 'voters', 'label' => 'Voters', 'url' => route('superadmin.users.index'), 'active' => 'superadmin.users.*'],
+            ['key' => 'results', 'label' => 'Results', 'url' => route('superadmin.docs.show'), 'active' => 'superadmin.docs.*'],
+            ['key' => 'settings', 'label' => 'Settings', 'url' => route('profile.edit'), 'active' => 'profile.*'],
+        ],
         'admin' => [
-            ['key' => 'dashboard', 'label' => 'Dashboard', 'url' => route('admin.dashboard')],
-            ['key' => 'elections', 'label' => 'Elections', 'url' => route('admin.elections.index')],
-            ['key' => 'candidates', 'label' => 'Candidates', 'url' => route('admin.candidates.index')],
-            ['key' => 'voters', 'label' => 'Voters', 'url' => route('admin.users.index')],
-            ['key' => 'results', 'label' => 'Results', 'url' => route('admin.results.index')],
-            ['key' => 'settings', 'label' => 'Settings', 'url' => route('profile.edit')],
+            ['key' => 'dashboard', 'label' => 'Dashboard', 'url' => route('admin.dashboard'), 'active' => 'admin.dashboard'],
+            ['key' => 'elections', 'label' => 'Elections', 'url' => route('admin.elections.index'), 'active' => 'admin.elections.*'],
+            ['key' => 'candidates', 'label' => 'Candidates', 'url' => route('admin.candidates.index'), 'active' => 'admin.candidates.*'],
+            ['key' => 'voters', 'label' => 'Voters', 'url' => route('admin.users.index'), 'active' => 'admin.users.*'],
+            ['key' => 'results', 'label' => 'Results', 'url' => route('admin.results.index'), 'active' => 'admin.results.*'],
+            ['key' => 'settings', 'label' => 'Settings', 'url' => route('profile.edit'), 'active' => 'profile.*'],
         ],
         'officer' => [
-            ['key' => 'dashboard', 'label' => 'Dashboard', 'url' => route('officer.dashboard')],
-            ['key' => 'elections', 'label' => 'Positions', 'url' => route('officer.positions.index')],
-            ['key' => 'candidates', 'label' => 'Candidates', 'url' => route('officer.candidates.index')],
-            ['key' => 'results', 'label' => 'Results', 'url' => route('officer.dashboard')],
-            ['key' => 'settings', 'label' => 'Settings', 'url' => route('profile.edit')],
+            ['key' => 'dashboard', 'label' => 'Dashboard', 'url' => route('officer.dashboard'), 'active' => 'officer.dashboard'],
+            ['key' => 'elections', 'label' => 'Elections', 'url' => route('officer.elections.index'), 'active' => 'officer.elections.*|officer.positions.*'],
+            ['key' => 'candidates', 'label' => 'Candidates', 'url' => route('officer.candidates.index'), 'active' => 'officer.candidates.*'],
+            ['key' => 'voters', 'label' => 'Voters', 'url' => route('officer.dashboard'), 'active' => 'officer.dashboard'],
+            ['key' => 'results', 'label' => 'Results', 'url' => route('officer.results.index'), 'active' => 'officer.results.*'],
+            ['key' => 'settings', 'label' => 'Settings', 'url' => route('profile.edit'), 'active' => 'profile.*'],
         ],
         default => [
-            ['key' => 'dashboard', 'label' => 'Dashboard', 'url' => route('voter.dashboard')],
-            ['key' => 'elections', 'label' => 'Elections', 'url' => route('voter.vote.index')],
-            ['key' => 'candidates', 'label' => 'Candidates', 'url' => route('voter.vote.index')],
-            ['key' => 'results', 'label' => 'Results', 'url' => route('voter.results.index')],
-            ['key' => 'settings', 'label' => 'Settings', 'url' => route('profile.edit')],
+            ['key' => 'dashboard', 'label' => 'Dashboard', 'url' => route('voter.dashboard'), 'active' => 'voter.dashboard'],
+            ['key' => 'elections', 'label' => 'Elections', 'url' => route('voter.vote.index'), 'active' => 'voter.vote.*'],
+            ['key' => 'candidates', 'label' => 'Candidates', 'url' => route('voter.vote.index'), 'active' => 'voter.vote.*'],
+            ['key' => 'voters', 'label' => 'Voters', 'url' => route('voter.dashboard'), 'active' => 'voter.dashboard'],
+            ['key' => 'results', 'label' => 'Results', 'url' => route('voter.results.index'), 'active' => 'voter.results.*'],
+            ['key' => 'settings', 'label' => 'Settings', 'url' => route('profile.edit'), 'active' => 'profile.*'],
         ],
     };
 
-    $mobileItems = collect($menuItems)->take(5)->values()->all();
+    $mobileItems = collect($menuItems)->values()->all();
 @endphp
 
-<div
-    class="min-h-screen bg-slate-100"
-    x-data="dashboardShell()"
-    x-init="init()"
->
+<div class="min-h-screen bg-slate-100" x-data="dashboardShell()" x-init="init()">
     <div class="flex min-h-screen">
-        <aside
-            class="hidden md:flex md:flex-col border-r border-slate-200 bg-white/95 backdrop-blur transition-all duration-200"
-            :class="sidebarOpen ? 'w-64' : 'w-20'"
-        >
+        <aside class="hidden md:flex md:flex-col border-r border-slate-200 bg-white/95 backdrop-blur transition-all duration-200" :class="sidebarOpen ? 'w-64' : 'w-20'">
             <div class="flex h-16 items-center justify-between border-b border-slate-200 px-4">
                 <a href="{{ route('home') }}" class="flex items-center gap-3">
                     <x-application-logo size="32" class="border border-slate-300" />
                     <span x-show="sidebarOpen" class="text-sm font-semibold text-slate-800">Evoting</span>
                 </a>
                 <button type="button" class="rounded-lg border border-slate-200 p-1.5 text-slate-600" @click="sidebarOpen = !sidebarOpen">
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                    </svg>
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
             </div>
 
             <nav class="flex-1 px-3 py-4 space-y-1">
                 @foreach($menuItems as $item)
-                    <a
-                        href="{{ $item['url'] }}"
-                        @click.prevent="navigate('{{ $item['url'] }}')"
-                        class="group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition"
-                        :class="isActive('{{ $item['url'] }}') ? 'bg-blue-50 text-blue-800' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'"
-                    >
+                    @php $isActive = collect(explode('|', $item['active']))->contains(fn ($p) => request()->routeIs($p)); @endphp
+                    <a href="{{ $item['url'] }}" @click.prevent="navigate('{{ $item['url'] }}')" class="group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition {{ $isActive ? 'bg-blue-50 text-blue-800' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
                         <span class="inline-flex h-5 w-5 items-center justify-center">
                             @if($item['key'] === 'dashboard')
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9M4 10v10h6v-6h4v6h6V10"/></svg>
@@ -146,7 +143,8 @@
                 <div x-show="mobileMenu" class="md:hidden border-t border-slate-200 px-4 py-3">
                     <div class="space-y-1">
                         @foreach($menuItems as $item)
-                            <a href="{{ $item['url'] }}" @click.prevent="mobileMenu=false; navigate('{{ $item['url'] }}')" class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">{{ $item['label'] }}</a>
+                            @php $isActive = collect(explode('|', $item['active']))->contains(fn ($p) => request()->routeIs($p)); @endphp
+                            <a href="{{ $item['url'] }}" @click.prevent="mobileMenu=false; navigate('{{ $item['url'] }}')" class="block rounded-lg px-3 py-2 text-sm font-medium {{ $isActive ? 'bg-blue-50 text-blue-800' : 'text-slate-700 hover:bg-slate-100' }}">{{ $item['label'] }}</a>
                         @endforeach
                     </div>
                 </div>
@@ -182,11 +180,11 @@
     </div>
 
     <nav class="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white md:hidden">
-        <div class="grid grid-cols-5">
+        <div class="grid grid-cols-6">
             @foreach($mobileItems as $item)
-                <a href="{{ $item['url'] }}" @click.prevent="navigate('{{ $item['url'] }}')" class="flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-medium"
-                   :class="isActive('{{ $item['url'] }}') ? 'text-blue-800' : 'text-slate-500'">
-                    <span class="h-1.5 w-1.5 rounded-full" :class="isActive('{{ $item['url'] }}') ? 'bg-blue-700' : 'bg-slate-300'"></span>
+                @php $isActive = collect(explode('|', $item['active']))->contains(fn ($p) => request()->routeIs($p)); @endphp
+                <a href="{{ $item['url'] }}" @click.prevent="navigate('{{ $item['url'] }}')" class="flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-medium {{ $isActive ? 'text-blue-800' : 'text-slate-500 hover:text-slate-700' }}">
+                    <span class="h-1.5 w-1.5 rounded-full {{ $isActive ? 'bg-blue-700' : 'bg-slate-300' }}"></span>
                     <span>{{ $item['label'] }}</span>
                 </a>
             @endforeach
@@ -204,15 +202,6 @@ function dashboardShell() {
             window.addEventListener('popstate', () => {
                 this.navigate(window.location.href, false);
             });
-        },
-        isActive(url) {
-            try {
-                const current = window.location.pathname.replace(/\/$/, '');
-                const target = new URL(url, window.location.origin).pathname.replace(/\/$/, '');
-                return current === target;
-            } catch (_) {
-                return false;
-            }
         },
         async navigate(url, push = true) {
             if (this.loading) return;

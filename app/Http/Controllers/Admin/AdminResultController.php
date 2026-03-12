@@ -17,7 +17,10 @@ class AdminResultController extends Controller
 {
     public function index(): View
     {
-        $elections = Election::latest()->get();
+        $elections = Election::query()
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
 
         return view('admin.results.index', compact('elections'));
     }
@@ -183,7 +186,11 @@ class AdminResultController extends Controller
     {
         $totalVotes = Vote::where('election_id', $election->id)->count();
         $uniqueVoters = Vote::where('election_id', $election->id)->distinct('user_id')->count('user_id');
-        $eligibleVoters = User::where('role', 'voter')->where('status', 'active')->count();
+        $eligibleVoters = User::query()
+            ->where('role', 'voter')
+            ->where('status', 'active')
+            ->where('organization_id', auth()->user()?->organization_id)
+            ->count();
         $turnout = $eligibleVoters > 0 ? round(($uniqueVoters / $eligibleVoters) * 100, 2) : 0.0;
 
         return [
@@ -205,3 +212,4 @@ class AdminResultController extends Controller
         ];
     }
 }
+

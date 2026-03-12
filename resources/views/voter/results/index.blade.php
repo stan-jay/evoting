@@ -27,6 +27,10 @@
                 </div>
             @endforelse
         </div>
+
+        <div class="mt-5">
+            {{ $elections->links() }}
+        </div>
     </section>
 </div>
 @endsection

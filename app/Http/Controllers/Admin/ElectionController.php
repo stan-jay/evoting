@@ -10,7 +10,11 @@ class ElectionController extends Controller
 {
     public function index()
     {
-        $elections = Election::latest()->get();
+        $elections = Election::query()
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
         return view('admin.elections.index', compact('elections'));
     }
 
@@ -65,46 +69,44 @@ class ElectionController extends Controller
     }
 
     public function activate(Election $election)
-{
-    if ($election->status !== 'pending') {
-        return back()->with('error', 'Only pending elections can be activated.');
+    {
+        if ($election->status !== 'pending') {
+            return back()->with('error', 'Only pending elections can be activated.');
+        }
+
+        $election->update([
+            'status' => 'active',
+            'start_time' => now(),
+        ]);
+
+        return back()->with('success', 'Election started.');
     }
 
-    $election->update([
-        'status' => 'active',
-        'start_time' => now(),
-    ]);
+    public function start(Election $election)
+    {
+        if ($election->status !== 'pending') {
+            return back()->with('error', 'Election already started.');
+        }
 
-    return back()->with('success', 'Election started.');
-}
+        $election->update([
+            'status' => 'active',
+            'start_time' => now(),
+        ]);
 
-public function start(Election $election)
-{
-    if ($election->status !== 'pending') {
-        return back()->with('error', 'Election already started.');
+        return back()->with('success', 'Election started successfully.');
     }
 
-    $election->update([
-        'status' => 'active',
-        'start_time' => now(),
-    ]);
+    public function close(Election $election)
+    {
+        if ($election->status !== 'active') {
+            return back()->with('error', 'Only active elections can be closed.');
+        }
 
-    return back()->with('success', 'Election started successfully.');
-}
+        $election->update([
+            'status' => 'closed',
+            'end_time' => now(),
+        ]);
 
-public function close(Election $election)
-{
-    if ($election->status !== 'active') {
-        return back()->with('error', 'Only active elections can be closed.');
+        return back()->with('success', 'Election closed and results locked.');
     }
-
-    $election->update([
-        'status' => 'closed',
-        'end_time' => now(),
-    ]);
-
-    return back()->with('success', 'Election closed and results locked.');
-}
-
-
 }

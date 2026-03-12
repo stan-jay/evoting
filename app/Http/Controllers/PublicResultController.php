@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Election;
 use App\Models\Vote;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 
 class PublicResultController extends Controller
@@ -16,9 +16,21 @@ class PublicResultController extends Controller
         $elections = Election::query()
             ->where('status', 'declared')
             ->orderByDesc('end_time')
-            ->get();
+            ->paginate(12)
+            ->withQueryString();
 
         return view('voter.results.index', compact('elections'));
+    }
+
+    public function indexOfficer(): View
+    {
+        $elections = Election::query()
+            ->whereIn('status', ['active', 'closed', 'declared'])
+            ->orderByDesc('end_time')
+            ->paginate(12)
+            ->withQueryString();
+
+        return view('officer.results.index', compact('elections'));
     }
 
     public function showVoter(Election $election): View
@@ -62,7 +74,7 @@ class PublicResultController extends Controller
 
     private function ensureVisibleForOfficers(Election $election): void
     {
-        if (!in_array($election->status, ['active', 'closed', 'declared'], true)) {
+        if (! in_array($election->status, ['active', 'closed', 'declared'], true)) {
             abort(403, 'Result analytics are not yet available.');
         }
     }

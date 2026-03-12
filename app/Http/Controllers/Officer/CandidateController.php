@@ -14,15 +14,23 @@ class CandidateController extends Controller
 {
     public function index()
     {
-        $candidates = Candidate::with('position.election')->get();
-        $positions  = Position::with('election')->get();
+        $candidates = Candidate::query()
+            ->with('position.election')
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
+
+        $positions = Position::query()
+            ->with('election')
+            ->latest('id')
+            ->get();
 
         return view('officer.candidates.index', compact('candidates', 'positions'));
     }
 
     public function create()
     {
-        $positions = Position::with('election')->get();
+        $positions = Position::with('election')->latest('id')->get();
 
         return view('officer.candidates.create', compact('positions'));
     }
@@ -120,4 +128,3 @@ class CandidateController extends Controller
         }
     }
 }
-

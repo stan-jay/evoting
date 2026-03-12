@@ -12,24 +12,30 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $q = $request->query('q');
-        $users = User::when($q, fn($qb) => $qb->where(function($w) use ($q) {
+        $organizationId = Auth::user()?->organization_id;
+
+        $users = User::query()
+            ->where('organization_id', $organizationId)
+            ->when($q, fn ($qb) => $qb->where(function ($w) use ($q) {
                 $w->where('name', 'like', "%{$q}%")
-                  ->orWhere('email', 'like', "%{$q}%");
+                    ->orWhere('email', 'like', "%{$q}%");
             }))
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+            ->orderByDesc('created_at')
+            ->paginate(20)
+            ->withQueryString();
 
         return view('admin.users.index', compact('users', 'q'));
     }
 
     public function update(Request $request, User $user)
     {
+        $this->ensureSameOrganization($user);
+
         $data = $request->validate([
-            'role'   => 'required|string|in:voter,officer,admin',
+            'role' => 'required|string|in:voter,officer,admin',
             'status' => 'required|string|in:active,suspended',
         ]);
 
-        // Use getKey() and Auth::id() for consistent identity checks
         if ($user->getKey() === Auth::id() && $data['role'] !== 'admin') {
             return back()->with('error', 'You cannot change your own admin role.');
         }
@@ -43,7 +49,8 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        // Prevent acting on yourself
+        $this->ensureSameOrganization($user);
+
         if (Auth::id() === $user->getKey()) {
             return back()->with('error', 'You cannot remove your own account here.');
         }
@@ -52,5 +59,12 @@ class UserController extends Controller
         $user->save();
 
         return back()->with('success', 'User deactivated.');
+    }
+
+    private function ensureSameOrganization(User $user): void
+    {
+        if ((int) $user->organization_id !== (int) Auth::user()?->organization_id) {
+            abort(404);
+        }
     }
 }

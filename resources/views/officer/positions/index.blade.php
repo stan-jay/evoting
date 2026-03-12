@@ -26,40 +26,46 @@
     </div>
 
     <div class="bg-white p-6 rounded-xl border shadow-sm">
-        <table class="w-full">
-            <thead>
-                <tr class="border-b text-left">
-                    <th class="py-2">Position</th>
-                    <th>Election</th>
-                    <th>Status</th>
-                    <th class="text-right">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($positions as $position)
-                    <tr class="border-b">
-                        <td class="py-2">{{ $position->name }}</td>
-                        <td>{{ $position->election->title }}</td>
-                        <td>{{ ucfirst($position->election->status) }}</td>
-                        <td class="text-right space-x-2">
-                            <a href="{{ route('officer.positions.edit', $position) }}" class="text-blue-600">Edit</a>
-                            <form method="POST" action="{{ route('officer.positions.destroy', $position) }}" class="inline">
-                                @csrf @method('DELETE')
-                                <button class="text-red-600" onclick="return confirm('Delete this position?')">
-                                    Delete
-                                </button>
-                            </form>
-                        </td>
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-[700px]">
+                <thead>
+                    <tr class="border-b text-left">
+                        <th class="py-2">Position</th>
+                        <th>Election</th>
+                        <th>Status</th>
+                        <th class="text-right">Actions</th>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="4" class="py-4 text-center text-gray-500">
-                            No positions found.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @forelse($positions as $position)
+                        <tr class="border-b">
+                            <td class="py-2">{{ $position->name }}</td>
+                            <td>{{ $position->election->title }}</td>
+                            <td>{{ ucfirst($position->election->status) }}</td>
+                            <td class="text-right space-x-2">
+                                <a href="{{ route('officer.positions.edit', $position) }}" class="text-blue-600">Edit</a>
+                                <form method="POST" action="{{ route('officer.positions.destroy', $position) }}" class="inline">
+                                    @csrf @method('DELETE')
+                                    <button class="text-red-600" onclick="return confirm('Delete this position?')">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="py-4 text-center text-gray-500">
+                                No positions found.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4">
+            {{ $positions->links() }}
+        </div>
     </div>
 
 </div>

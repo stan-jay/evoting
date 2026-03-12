@@ -15,9 +15,9 @@
                         @php $role = optional(Auth::user())->role; @endphp
 
                         @if($role === 'super_admin')
-                            <a href="{{ route('super_admin.dashboard') }}" class="btn-tertiary">Organizations</a>
-                            <a href="{{ route('super_admin.users.index') }}" class="btn-tertiary">Users</a>
-                            <a href="{{ route('super_admin.docs.show') }}" class="btn-tertiary">Docs</a>
+                            <a href="{{ route('superadmin.dashboard') }}" class="btn-tertiary">Organizations</a>
+                            <a href="{{ route('superadmin.users.index') }}" class="btn-tertiary">Users</a>
+                            <a href="{{ route('superadmin.docs.show') }}" class="btn-tertiary">Docs</a>
                         @elseif($role === 'admin')
                             <a href="{{ Route::has('admin.dashboard') ? route('admin.dashboard') : url('/admin/dashboard') }}" class="btn-tertiary">Dashboard</a>
                             <a href="{{ route('admin.users.index') }}" class="btn-tertiary">Users</a>
@@ -98,9 +98,9 @@
                 @php $role = optional(Auth::user())->role; @endphp
 
                 @if($role === 'super_admin')
-                    <a @click="open = false" href="{{ route('super_admin.dashboard') }}" class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Organizations</a>
-                    <a @click="open = false" href="{{ route('super_admin.users.index') }}" class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Users</a>
-                    <a @click="open = false" href="{{ route('super_admin.docs.show') }}" class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Docs</a>
+                    <a @click="open = false" href="{{ route('superadmin.dashboard') }}" class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Organizations</a>
+                    <a @click="open = false" href="{{ route('superadmin.users.index') }}" class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Users</a>
+                    <a @click="open = false" href="{{ route('superadmin.docs.show') }}" class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Docs</a>
                 @elseif($role === 'admin')
                     <a @click="open = false" href="{{ Route::has('admin.dashboard') ? route('admin.dashboard') : url('/admin/dashboard') }}" class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Dashboard</a>
                     <a @click="open = false" href="{{ route('admin.users.index') }}" class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Users</a>
@@ -139,3 +139,4 @@
         </div>
     </div>
 </nav>
+

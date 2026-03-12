@@ -27,7 +27,7 @@ class UserInterventionController extends Controller
             ->paginate(30)
             ->withQueryString();
 
-        return view('super_admin.users.index', compact('users', 'q', 'organizationId'));
+        return view('superadmin.users.index', compact('users', 'q', 'organizationId'));
     }
 
     public function update(Request $request, User $user): RedirectResponse
@@ -48,3 +48,4 @@ class UserInterventionController extends Controller
         return back()->with('success', 'User intervention applied successfully.');
     }
 }
+

@@ -30,17 +30,24 @@ Route::middleware(['auth', 'active'])->get('/dashboard', DashboardController::cl
 
 Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/media/candidates/{candidate}/photo', [CandidatePhotoController::class, 'show'])->name('media.candidates.photo');
+    Route::get('/results', function () {
+        return match (auth()->user()?->role) {
+            'super_admin' => redirect()->route('superadmin.dashboard'),
+            'admin' => redirect()->route('admin.results.index'),
+            'officer' => redirect()->route('officer.results.index'),
+            default => redirect()->route('voter.results.index'),
+        };
+    })->name('results.redirect');
     // Backward-compatible voter shortcuts for legacy links.
     Route::middleware('role:voter')->group(function () {
         Route::get('/elections', fn () => redirect()->route('voter.vote.index'))->name('elections.index');
         Route::get('/elections/{election}', fn (\App\Models\Election $election) => redirect()->route('voter.vote.create', $election))->name('elections.show');
-        Route::get('/results', fn () => redirect()->route('voter.results.index'))->name('results.index');
     });
 
     // SUPER ADMIN
     Route::middleware(['auth', 'role:super_admin'])
-        ->prefix('super-admin')
-        ->name('super_admin.')
+        ->prefix('superadmin')
+        ->name('superadmin.')
         ->group(function () {
             Route::get('/dashboard', [SuperAdminOrganizationController::class, 'index'])->name('dashboard');
             Route::get('/organizations', [SuperAdminOrganizationController::class, 'index'])->name('organizations.index');
@@ -135,6 +142,8 @@ Route::middleware(['auth', 'role:admin'])
         ->name('officer.')
         ->group(function () {
             Route::get('/dashboard', fn () => view('officer.dashboard'))->name('dashboard');
+            Route::get('/elections', fn () => redirect()->route('officer.positions.index'))->name('elections.index');
+            Route::get('/results', [PublicResultController::class, 'indexOfficer'])->name('results.index');
 
             Route::resource('positions', PositionController::class);
             Route::resource('candidates', OfficerCandidateController::class);
@@ -170,4 +179,12 @@ Route::middleware(['auth', 'role:admin'])
 });
 
 require __DIR__.'/auth.php';
+
+
+
+Route::redirect('/super-admin/dashboard', '/superadmin/dashboard');
+Route::redirect('/super-admin/organizations', '/superadmin/organizations');
+Route::redirect('/super-admin/users', '/superadmin/users');
+Route::redirect('/super-admin/docs', '/superadmin/docs');
+
 

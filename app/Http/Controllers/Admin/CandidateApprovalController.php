@@ -9,10 +9,12 @@ class CandidateApprovalController extends Controller
 {
     public function index()
     {
-        $candidates = Candidate::with('position.election')
+        $candidates = Candidate::query()
+            ->with('position.election')
             ->where('status', 'pending')
             ->latest()
-            ->get();
+            ->paginate(20)
+            ->withQueryString();
 
         return view('admin.candidates.approval', compact('candidates'));
     }

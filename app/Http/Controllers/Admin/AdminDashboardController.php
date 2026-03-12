@@ -14,7 +14,10 @@ class AdminDashboardController extends Controller
     {
         $elections = Election::count();
         $activeElections = Election::where('status', 'active')->count();
-        $totalVoters = User::where('role', 'voter')->count();
+        $totalVoters = User::query()
+            ->where('role', 'voter')
+            ->where('organization_id', auth()->user()?->organization_id)
+            ->count();
         $totalCandidates = Candidate::count();
         $totalVotes = Vote::count();
 
@@ -27,3 +30,4 @@ class AdminDashboardController extends Controller
         ));
     }
 }
+

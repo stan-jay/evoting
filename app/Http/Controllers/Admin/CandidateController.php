@@ -9,11 +9,12 @@ class CandidateController extends Controller
 {
     public function index()
     {
-        $candidates = Candidate::with('position.election')
+        $candidates = Candidate::query()
+            ->with('position.election')
             ->latest()
-            ->get();
+            ->paginate(20)
+            ->withQueryString();
 
         return view('admin.candidates.index', compact('candidates'));
     }
 }
-

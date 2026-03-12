@@ -7,8 +7,8 @@
         <h1 class="page-title">Super Admin - Organizations</h1>
         <p class="page-subtitle">Onboard institutions, assign administrative ownership, and maintain oversight from a single governance panel.</p>
         <div class="mt-5 flex flex-wrap gap-3">
-            <a href="{{ route('super_admin.users.index') }}" class="btn-secondary">Intervene Users</a>
-            <a href="{{ route('super_admin.docs.show') }}" class="btn-primary">View Docs</a>
+            <a href="{{ route('superadmin.users.index') }}" class="btn-secondary">Intervene Users</a>
+            <a href="{{ route('superadmin.docs.show') }}" class="btn-primary">View Docs</a>
         </div>
     </section>
 
@@ -16,7 +16,7 @@
         <h2 class="section-title">Create Organization</h2>
         <p class="section-subtitle">Provision a new institution and send an administrative onboarding invite.</p>
 
-        <form method="POST" action="{{ route('super_admin.organizations.store') }}" class="mt-5 grid gap-4 md:grid-cols-2">
+        <form method="POST" action="{{ route('superadmin.organizations.store') }}" class="mt-5 grid gap-4 md:grid-cols-2">
             @csrf
             <div>
                 <label class="form-label" for="name">Organization Name</label>
@@ -49,7 +49,7 @@
         <p class="section-subtitle">Current institutional tenants and their platform footprint.</p>
 
         <div class="mt-5 overflow-x-auto">
-            <table class="data-table min-w-full">
+            <table class="data-table min-w-[700px]">
                 <thead>
                     <tr class="text-left">
                         <th>Name</th>
@@ -69,7 +69,7 @@
                             <td>{{ $organization->elections_count }}</td>
                             <td><x-status-badge :status="$organization->status" /></td>
                             <td class="text-right">
-                                <form method="POST" action="{{ route('super_admin.organizations.destroy', $organization) }}" onsubmit="return confirm('Delete this organization and all associated records?');">
+                                <form method="POST" action="{{ route('superadmin.organizations.destroy', $organization) }}" onsubmit="return confirm('Delete this organization and all associated records?');">
                                     @csrf
                                     @method('DELETE')
                                     <button class="btn-danger">Delete</button>
@@ -91,3 +91,5 @@
     </section>
 </div>
 @endsection
+
+

@@ -16,7 +16,7 @@
         <p class="section-subtitle">Delete is available for records you need to remove from the system. Use it carefully because it is irreversible.</p>
 
         <div class="mt-5 overflow-x-auto">
-            <table class="data-table min-w-full">
+            <table class="data-table min-w-[700px]">
                 <thead>
                     <tr class="text-left">
                         <th>Title</th>
@@ -67,6 +67,10 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+
+        <div class="mt-5">
+            {{ $elections->links() }}
         </div>
     </section>
 </div>

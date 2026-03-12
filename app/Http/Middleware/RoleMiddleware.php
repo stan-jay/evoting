@@ -9,15 +9,22 @@ class RoleMiddleware
 {
     public function handle(Request $request, Closure $next, ...$roles)
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             abort(403);
         }
 
-        if (!in_array(auth()->user()->role, $roles)) {
+        $user = auth()->user();
+
+        if ($user->status !== 'active') {
             abort(403);
         }
 
-        if (auth()->user()->status !== 'active') {
+        // Super admin can pass role checks on all guarded route groups.
+        if ($user->role === 'super_admin') {
+            return $next($request);
+        }
+
+        if (! in_array($user->role, $roles, true)) {
             abort(403);
         }
 

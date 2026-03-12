@@ -12,7 +12,7 @@ class DashboardController extends Controller
         $user = auth()->user();
 
         $target = match ($user?->role) {
-            'super_admin' => Route::has('super_admin.dashboard') ? route('super_admin.dashboard') : url('/super-admin/dashboard'),
+            'super_admin' => Route::has('superadmin.dashboard') ? route('superadmin.dashboard') : url('/superadmin/dashboard'),
             'admin' => Route::has('admin.dashboard') ? route('admin.dashboard') : url('/admin/dashboard'),
             'officer' => Route::has('officer.dashboard') ? route('officer.dashboard') : url('/officer/dashboard'),
             default => Route::has('voter.dashboard') ? route('voter.dashboard') : url('/voter/dashboard'),

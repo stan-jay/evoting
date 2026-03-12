@@ -81,7 +81,7 @@
             </div>
 
             <div class="overflow-x-auto">
-                <table class="w-full border min-w-[480px]">
+                <table class="w-full border min-w-[700px]">
                     <thead class="bg-gray-100">
                         <tr>
                             <th class="p-3 text-left">Rank</th>
@@ -238,3 +238,4 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 @endsection
+

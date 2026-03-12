@@ -8,7 +8,7 @@
     </div>
 
     <div class="bg-white p-6 rounded-xl border shadow-sm">
-        <form method="GET" action="{{ route('super_admin.users.index') }}" class="grid gap-4 md:grid-cols-3">
+        <form method="GET" action="{{ route('superadmin.users.index') }}" class="grid gap-4 md:grid-cols-3">
             <input type="text" name="q" value="{{ $q }}" placeholder="Search name or email" class="border rounded px-3 py-2">
             <input type="number" name="organization_id" value="{{ $organizationId }}" placeholder="Organization ID" class="border rounded px-3 py-2">
             <button class="px-4 py-2 rounded bg-blue-600 text-white">Filter</button>
@@ -34,7 +34,7 @@
                         <td>{{ $user->email }}</td>
                         <td>{{ $user->organization->name ?? '-' }} ({{ $user->organization_id ?? '-' }})</td>
                         <td>
-                            <form method="POST" action="{{ route('super_admin.users.update', $user) }}" class="flex items-center gap-2 justify-end">
+                            <form method="POST" action="{{ route('superadmin.users.update', $user) }}" class="flex items-center gap-2 justify-end">
                                 @csrf
                                 @method('PUT')
                                 <select name="role" class="border rounded px-2 py-1">
@@ -68,3 +68,4 @@
     </div>
 </div>
 @endsection
+

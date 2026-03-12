@@ -19,7 +19,7 @@
         </form>
 
         <div class="overflow-x-auto">
-            <table class="w-full">
+            <table class="w-full min-w-[700px]">
                 <thead>
                     <tr class="border-b text-left">
                         <th class="py-2">Name</th>
@@ -76,3 +76,4 @@
     </div>
 </div>
 @endsection
+

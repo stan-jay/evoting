@@ -21,7 +21,11 @@ class VoteController extends Controller
      */
     public function index()
     {
-        $elections = Election::orderBy('start_time', 'asc')->get();
+        $elections = Election::query()
+            ->whereIn('status', ['active', 'pending', 'closed', 'declared'])
+            ->orderBy('start_time', 'asc')
+            ->paginate(12)
+            ->withQueryString();
 
         return view('voter.dashboard', compact('elections'));
     }
@@ -186,3 +190,4 @@ class VoteController extends Controller
             ->with('success', 'Your vote has been submitted successfully.');
     }
 }
+

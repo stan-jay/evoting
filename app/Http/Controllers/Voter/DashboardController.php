@@ -13,7 +13,8 @@ class DashboardController extends Controller
         $elections = Election::query()
             ->whereIn('status', ['active', 'pending', 'closed', 'declared'])
             ->orderBy('start_time', 'asc')
-            ->get();
+            ->paginate(12)
+            ->withQueryString();
 
         return view('voter.dashboard', compact('elections'));
     }

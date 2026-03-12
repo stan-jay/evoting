@@ -21,7 +21,7 @@ class OrganizationController extends Controller
             ->latest()
             ->paginate(20);
 
-        return view('super_admin.organizations.index', compact('organizations'));
+        return view('superadmin.organizations.index', compact('organizations'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -77,3 +77,4 @@ class OrganizationController extends Controller
         return back()->with('success', 'Organization deleted with related records.');
     }
 }
+

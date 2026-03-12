@@ -14,7 +14,7 @@
                 <h2 class="section-title">Election Directory</h2>
                 <p class="section-subtitle">Each election follows a controlled lifecycle with clear status indicators.</p>
             </div>
-            <div class="hidden md:block text-xs uppercase tracking-[0.18em] text-slate-500">{{ $elections->count() }} listed</div>
+            <div class="hidden md:block text-xs uppercase tracking-[0.18em] text-slate-500">{{ $elections->total() }} listed</div>
         </div>
 
         <div class="mt-5 space-y-3">
@@ -44,6 +44,10 @@
                     No elections are available right now.
                 </div>
             @endforelse
+        </div>
+
+        <div class="mt-5">
+            {{ $elections->links() }}
         </div>
     </section>
 

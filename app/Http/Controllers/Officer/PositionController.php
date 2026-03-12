@@ -3,23 +3,34 @@
 namespace App\Http\Controllers\Officer;
 
 use App\Http\Controllers\Controller;
-use App\Models\Position;
 use App\Models\Election;
+use App\Models\Position;
 use Illuminate\Http\Request;
 
 class PositionController extends Controller
 {
     public function index()
     {
-        $positions = Position::with('election')->get();
-        $elections = Election::where('status', '!=', 'closed')->get();
+        $positions = Position::query()
+            ->with('election')
+            ->latest('id')
+            ->paginate(20)
+            ->withQueryString();
+
+        $elections = Election::query()
+            ->where('status', '!=', 'closed')
+            ->latest('start_time')
+            ->get();
 
         return view('officer.positions.index', compact('positions', 'elections'));
     }
 
     public function create()
     {
-        $elections = Election::where('status', '!=', 'closed')->get();
+        $elections = Election::query()
+            ->where('status', '!=', 'closed')
+            ->latest('start_time')
+            ->get();
 
         return view('officer.positions.create', compact('elections'));
     }

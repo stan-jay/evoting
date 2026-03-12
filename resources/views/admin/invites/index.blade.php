@@ -41,7 +41,7 @@
         <p class="section-subtitle">Review delivery state, expiry, and resend eligibility.</p>
 
         <div class="mt-5 overflow-x-auto">
-            <table class="data-table min-w-full">
+            <table class="data-table min-w-[700px]">
                 <thead>
                     <tr class="text-left">
                         <th>Email</th>
@@ -94,3 +94,4 @@
     </section>
 </div>
 @endsection
+

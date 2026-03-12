@@ -9,53 +9,59 @@
     </div>
 
     <div class="bg-white p-6 rounded-xl border shadow-sm">
-        <table class="w-full">
-            <thead>
-                <tr class="border-b text-left">
-                    <th class="py-2">Election</th>
-                    <th>Status</th>
-                    <th class="text-right">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($elections as $election)
-                    <tr class="border-b">
-                        <td class="py-2">{{ $election->title }}</td>
-                        <td>{{ ucfirst($election->status) }}</td>
-                        <td class="text-right">
-                            <div class="inline-flex items-center gap-3">
-                                @if(in_array($election->status, ['active', 'closed', 'declared']))
-                                    <a href="{{ route('admin.results.show', $election) }}" class="text-blue-600">
-                                        View Analytics
-                                    </a>
-                                @endif
-
-                                @if($election->status === 'closed')
-                                    <form method="POST" action="{{ route('admin.results.publish', $election) }}" class="inline">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" class="text-emerald-700">Publish</button>
-                                    </form>
-                                @elseif($election->status === 'declared')
-                                    <form method="POST" action="{{ route('admin.results.unpublish', $election) }}" class="inline">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" class="text-amber-700">Unpublish</button>
-                                    </form>
-                                @endif
-                            </div>
-
-                        </td>
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-[700px]">
+                <thead>
+                    <tr class="border-b text-left">
+                        <th class="py-2">Election</th>
+                        <th>Status</th>
+                        <th class="text-right">Actions</th>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="3" class="py-6 text-center text-gray-500">
-                            No elections found.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @forelse($elections as $election)
+                        <tr class="border-b">
+                            <td class="py-2">{{ $election->title }}</td>
+                            <td>{{ ucfirst($election->status) }}</td>
+                            <td class="text-right">
+                                <div class="inline-flex items-center gap-3">
+                                    @if(in_array($election->status, ['active', 'closed', 'declared']))
+                                        <a href="{{ route('admin.results.show', $election) }}" class="text-blue-600">
+                                            View Analytics
+                                        </a>
+                                    @endif
+
+                                    @if($election->status === 'closed')
+                                        <form method="POST" action="{{ route('admin.results.publish', $election) }}" class="inline">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="text-emerald-700">Publish</button>
+                                        </form>
+                                    @elseif($election->status === 'declared')
+                                        <form method="POST" action="{{ route('admin.results.unpublish', $election) }}" class="inline">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="text-amber-700">Unpublish</button>
+                                        </form>
+                                    @endif
+                                </div>
+
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="py-6 text-center text-gray-500">
+                                No elections found.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4">
+            {{ $elections->links() }}
+        </div>
     </div>
 
 </div>
